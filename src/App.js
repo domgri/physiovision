@@ -20,27 +20,27 @@ function App() {
 
   const [appState, setAppState] = useState("stop");
 
+   const exerciseStates = ["setup", "run", "finish"]
+   const armStates = ["inside", "outside"]
+
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
 
   var list = []
 
-  console.log(appState)
+  //console.log(appState)
 
   if (appState == "run") {
 
-    
-  console.log("here")
-  
+    //console.log(appState + " run")
 
     const detectorConfig = {modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER};
 
     var detector = null;
 
-    const exerciseStates = ["setup", "run", "finish"]
-    const armStates = ["inside", "outside"]
+    
 
-    var currectExerciseState = "setup";
+    var currentExerciseState = "setup";
     var currentArmState = "inside";
 
 
@@ -52,33 +52,40 @@ function App() {
     const PX_THRESHOLD = 10
     const SCALE = 1
 
-    const REPETITIONS = 10
+    const REPETITIONS = 2
 
     const colour1 = "#F5CAC3"
     const colour2 = "#F7EDE2"
 
+    var interval = null;
 
 
 
-    const determineExerciseState = async (leftShoulderX, leftWristX) => {
+
+
+    // functions
+
+    function determineExerciseState(leftShoulderX, leftWristX) {
 
       if (((leftWristX) > leftShoulderX) && (currentArmState != "outside")) {
         currentArmState = "outside";
+
         
       }
       else if ((leftWristX < leftShoulderX)  && (currentArmState != "inside")) {
         currentArmState = "inside";
+
         count += 1;
 
       }
 
       if (count >= REPETITIONS) {
-        currectExerciseState = exerciseStates[2]
+        currentExerciseState = exerciseStates[2]
       }
       
     }
 
-    const drawRepetitions = async (ctx, canvas) => {
+    function drawRepetitions(ctx, canvas){
 
       drawText(canvas.current.width - 50, 50, count +"/"+ REPETITIONS, 24, colour1, SCALE, ctx)
 
@@ -108,7 +115,7 @@ function App() {
       }
     }
 
-    const isReadyToStart = async (leftShoulder, rightShoulder, leftElbow, leftWrist,  ctx) => {
+    function isReadyToStart(leftShoulder, rightShoulder, leftElbow, leftWrist,  ctx) {
 
       //console.log("sh: "+ Math.abs((rightShoulder.x - leftShoulder.x)) )
       //console.log(leftWrist.x)
@@ -122,11 +129,11 @@ function App() {
       if (((Math.abs(leftWrist.x - positionX) < PX_THRESHOLD * 5) && (positionX > 0))
         && (Math.abs(leftWrist.y - positionY) < PX_THRESHOLD * 5) && (positionY > 0)) {
 
-        currectExerciseState = exerciseStates[1]
-        console.log(rightShoulder.x )
-        console.log(leftShoulder.x)
-        console.log(leftWrist.x)
-        console.log(Math.abs(rightShoulder.x - leftShoulder.x) - leftWrist.x)
+        currentExerciseState = exerciseStates[1]
+        //console.log(rightShoulder.x )
+        //console.log(leftShoulder.x)
+        //console.log(leftWrist.x)
+        //console.log(Math.abs(rightShoulder.x - leftShoulder.x) - leftWrist.x)
 
       }
 
@@ -138,21 +145,31 @@ function App() {
 
     const setupDetector = async () => {
 
+      //console.log("setupDetector A")
+
       detector = await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet, detectorConfig);
+      //console.log("setupDetector B")
+    
     }
     
-    const runDetection = async () => {
+    function runDetection() {
 
-      if (currectExerciseState == exerciseStates[2]) {
+      //console.log("runDetection A")
+
+      if (currentExerciseState == exerciseStates[2]) {
         return
       }
 
-      var interval = setInterval(() => {
+      console.log("runDetection B")
+
+      // if (detector === null) {
+      //   return
+      // }
+
+      interval = setInterval(() => {
         console.log("interval")
 
         detect();
-
-         
         
       }, 1000/FPS);
 
@@ -163,6 +180,8 @@ function App() {
     }
 
     const detect = async () => {
+
+      //console.log("detect A")
 
       if (detector === null) {
         return
@@ -194,14 +213,14 @@ function App() {
       }
     }
 
-    const drawCanvas = (pose, video, videoWidth, videoHeight, canvas) => {
+    function drawCanvas (pose, video, videoWidth, videoHeight, canvas) {
       const ctx = canvas.current.getContext("2d");
       canvas.current.width = videoWidth;
       canvas.current.height = videoHeight;
 
-      console.log(currectExerciseState)
+      //console.log(currentExerciseState)
 
-      switch(currectExerciseState) {
+      switch(currentExerciseState) {
         case "setup":
           
           // Exercise specific keypoints
@@ -234,21 +253,30 @@ function App() {
         case "finish":
           drawText(50, 50, "Exercise finished", 24, colour1,  SCALE, ctx)
           setAppState("stop")
+          currentExerciseState = exerciseStates[2]
+          clearInterval(interval)
 
           break;
         default:
           console.log("exercise state error occured. Restart page.");
       } 
 
-
-      
-
       
     };
 
+      // main
 
-    setupDetector()
-    runDetection();
+          
+      setupDetector()
+      runDetection();
+
+      
+
+
+  }
+
+  function setExerciseState(state) {
+    currentExerciseState = state
   }
 
   return (
@@ -289,12 +317,12 @@ function App() {
 
 <div id='button'>
       <button  onClick={() => {setAppState("run")}}>
-      Start
+      (Re)Start
       </button>
 
-      <button onClick={() => {setAppState("stop")}}>
+      {/* <button onClick={() => {setAppState("stop"); setExerciseState(exerciseStates[2]); clearInterval(interval)}}>
       Stop
-      </button>
+      </button> */}
       <FPSStats />
 </div>
 
