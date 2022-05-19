@@ -52,7 +52,7 @@ function App() {
     const PX_THRESHOLD = 10
     const SCALE = 1
 
-    const REPETITIONS = 2
+    const REPETITIONS = 10
 
     const colour1 = "#F5CAC3"
     const colour2 = "#F7EDE2"
