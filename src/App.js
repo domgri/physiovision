@@ -14,8 +14,15 @@ import { drawKeypoints, drawSkeleton, drawSpecific, drawSegment, drawText, drawC
 
 import FPSStats from "react-fps-stats"
 
+//import MetaTags from 'react-meta-tags';
+
+import {Helmet} from "react-helmet";
+
+import MediaQuery from 'react-responsive'
+
 
 function App() {
+  
   
 
   const [appState, setAppState] = useState("stop");
@@ -27,6 +34,9 @@ function App() {
   const canvasRef = useRef(null);
 
   var list = []
+
+  var videoWidth = 640
+  var videoHeight = 480
 
   //console.log(appState)
 
@@ -195,8 +205,8 @@ function App() {
 
         // Get Video Properties
         const video = webcamRef.current.video;
-        const videoWidth = webcamRef.current.video.videoWidth;
-        const videoHeight = webcamRef.current.video.videoHeight;
+        videoWidth = webcamRef.current.video.videoWidth;
+        videoHeight = webcamRef.current.video.videoHeight;
 
         // Set video width
         webcamRef.current.video.width = videoWidth;
@@ -207,7 +217,7 @@ function App() {
       //var endTime = performance.now()
         //console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
     
-      
+      console.log(videoWidth)
       drawCanvas(poses, video, videoWidth, videoHeight, canvasRef);
 
       }
@@ -283,49 +293,105 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
+      {/* <MetaTags>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+      </MetaTags> */}
+
+      <Helmet>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+          <title>Prototype exercise 1.0.1</title>
+          {/* <link rel="canonical" href="http://mysite.com/example" /> */}
+      </Helmet>
+
+      <MediaQuery minWidth={1224}>
+        <Webcam
+              ref={webcamRef}
+              style={{
+                position: "absolute",
+                marginLeft: "auto",
+                marginRight: "auto",
+                left: 0,
+                right: 0,
+                textAlign: "center",
+                zindex: 9,
+                width: 640,
+                height: 480,
+              }}
+            />
+
+        <canvas
+          ref={canvasRef}
+          style={{
+            position: "absolute",
+            marginLeft: "auto",
+            marginRight: "auto",
+            left: 0,
+            right: 0,
+            textAlign: "center",
+            zindex: 9,
+            width: 640,
+            height: 480,
+          }}
+      />
+
+        <div id='button'>
+        <button  onClick={() => {setAppState("run")}}>
+        (Re)Start
+        </button>
+        </div>
+
+
+      </MediaQuery>
+
+      <MediaQuery maxWidth={640}>
+        <Webcam
+              ref={webcamRef}
+              style={{
+                position: "absolute",
+                marginLeft: "auto",
+                marginRight: "auto",
+                left: 0,
+                right: 0,
+                textAlign: "center",
+                zindex: 9,
+                width: 320,
+                height: 240,
+              }}
+            />
+
+        <canvas
+          ref={canvasRef}
+          style={{
+            position: "absolute",
+            marginLeft: "auto",
+            marginRight: "auto",
+            left: 0,
+            right: 0,
+            textAlign: "center",
+            zindex: 9,
+            width: 320,
+            height: 240,
+          }}
+      />
+
+        <div id='button'>
+        <button  onClick={() => {setAppState("run")}}>
+        (Re)Start
+        </button>
+        </div>
+
+
+      </MediaQuery>
 
         
 
-      <Webcam
-            ref={webcamRef}
-            style={{
-              position: "absolute",
-              marginLeft: "auto",
-              marginRight: "auto",
-              left: 0,
-              right: 0,
-              textAlign: "center",
-              zindex: 9,
-              width: 640,
-              height: 480,
-            }}
-          />
-
-      <canvas
-        ref={canvasRef}
-        style={{
-          position: "absolute",
-          marginLeft: "auto",
-          marginRight: "auto",
-          left: 0,
-          right: 0,
-          textAlign: "center",
-          zindex: 9,
-          width: 640,
-          height: 480,
-        }}
-    />
-
-<div id='button'>
-      <button  onClick={() => {setAppState("run")}}>
-      (Re)Start
-      </button>
+      
 
       {/* <button onClick={() => {setAppState("stop"); setExerciseState(exerciseStates[2]); clearInterval(interval)}}>
       Stop
       </button> */}
       <FPSStats />
-</div>
+
 
 
       </header>
