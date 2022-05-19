@@ -21,6 +21,33 @@ import {Helmet} from "react-helmet";
 import MediaQuery from 'react-responsive'
 
 
+
+  // // Get display size
+    
+  // function getWindowDimensions() {
+  //   const { innerWidth: width, innerHeight: height } = window;
+  //   return {
+  //     width,
+  //     height
+  //   };
+  // }
+  
+  //  function useWindowDimensions() {
+  //   const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
+  
+  //   useEffect(() => {
+  //     function handleResize() {
+  //       setWindowDimensions(getWindowDimensions());
+  //     }
+  
+  //     window.addEventListener('resize', handleResize);
+  //     return () => window.removeEventListener('resize', handleResize);
+  //   }, []);
+  
+  //   return windowDimensions;
+  // }
+
+
 function App() {
   
   
@@ -35,8 +62,14 @@ function App() {
 
   var list = []
 
-  var vWidth = window.innerWidth;
-  var vHeight = window.innerHeight;
+    var vWidth = window.innerWidth;
+    var vHeight = window.innerHeight;
+
+  //const {vWidth, vHeight} = useWindowDimensions();
+  console.log(vWidth)
+
+  const WIDTH = 640
+  const HEIGHT = 480
 
   const [size, setSize] = useState([0, 0]);
   
@@ -104,26 +137,34 @@ function App() {
 
     }
 
-    const isArmAside = async (leftShoulder, leftElbow, ctx, canvas) => {
+    const isArmAside = async (leftShoulder, leftElbow, ctx, canvas, videoWidth) => {
     
       if (Math.abs(leftShoulder.x - leftElbow.x) > PX_THRESHOLD * 5) {
 
         drawSegment([leftShoulder.y, leftShoulder.x], [leftElbow.y, leftElbow.x], colour2, SCALE, ctx )
+
+        mirror(ctx, videoWidth)
         
         drawText(50, 100, "Make sure your arm is aside", 24, colour2, SCALE, ctx)
+
+        mirror(ctx, videoWidth)
 
       }
 
     }
 
 
-    const isWristAlgned = async (leftElbow, leftWrist, ctx, canvas) => {
+    const isWristAlgned = async (leftElbow, leftWrist, ctx, canvas, videoWidth) => {
       
       if (Math.abs(leftElbow.y - leftWrist.y) > PX_THRESHOLD * 5) {
 
         drawSegment([leftElbow.y, leftElbow.x - 100], [leftElbow.y, leftElbow.x + 100], colour2, SCALE, ctx )
 
+        mirror(ctx, videoWidth)
+
         drawText(50, 150, "Maintain horizontal line of a wrist", 24, colour2, SCALE, ctx)
+
+        mirror(ctx, videoWidth)
 
       }
     }
@@ -221,33 +262,79 @@ function App() {
         //console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
     
       console.log(vWidth + " " + vHeight)
+      console.log(WIDTH+ " " + HEIGHT)
+      console.log(WIDTH * (vWidth / WIDTH)+ " " + HEIGHT * (vHeight / HEIGHT))
+      console.log("--")
+
+
+
       drawCanvas(poses, video, videoWidth, videoHeight, canvasRef);
 
       }
     }
 
+    function mirror(ctx, videoWidth) {
+        ctx.translate(videoWidth, 0);
+        ctx.scale(-1, 1);
+
+    }
+
+
     function drawCanvas (pose, video, videoWidth, videoHeight, canvas) {
       const ctx = canvas.current.getContext("2d");
+      //const ctxEx = canvas.current.getContext("2d");
       canvas.current.width = videoWidth;
       canvas.current.height = videoHeight;
 
-      //console.log(currentExerciseState)
+
+      
+      //const [mirroredState, setMirroredState] = useState(true);
+      
+      
+      
+
+
+
+      
+
 
       switch(currentExerciseState) {
         case "setup":
-          
-          // Exercise specific keypoints
-          //drawSpecific(pose[0]["keypoints"], 0.3, ctx)
-          drawPoint(ctx, pose[0]["keypoints"][9].y * 1, pose[0]["keypoints"][9].x * 1, 3, "aqua");
 
-          drawText(50, 50, "Put left palm on your body where a circle is to begin", 24, colour1, SCALE, ctx)
+        // mirrored first
+        mirror(ctx, videoWidth)
 
-          isReadyToStart(pose[0]["keypoints"][5], pose[0]["keypoints"][6], pose[0]["keypoints"][7], pose[0]["keypoints"][9], ctx)
+        // Exercise specific keypoints
+        //drawSpecific(pose[0]["keypoints"], 0.3, ctx)
+        drawPoint(ctx, pose[0]["keypoints"][9].y * 1, pose[0]["keypoints"][9].x * 1, 3, "aqua");
+
+        isReadyToStart(pose[0]["keypoints"][5], pose[0]["keypoints"][6], pose[0]["keypoints"][7], pose[0]["keypoints"][9], ctx)
+
+
+        // normal second
+        mirror(ctx, videoWidth)
+
+        drawText(50, 50, "Put left palm on your body where a circle is to begin", 24, colour1, SCALE, ctx)
+
 
           
           break;       
         case "run":
 
+
+        // mirrored first (roughyl, some methods do that inside)
+        mirror(ctx, videoWidth)
+
+        // Check if arm is located aside body, warn if not
+        isArmAside(pose[0]["keypoints"][5], pose[0]["keypoints"][7], ctx, canvas, videoWidth)
+        
+        isWristAlgned(pose[0]["keypoints"][7], pose[0]["keypoints"][9], ctx, canvas, videoWidth)
+
+
+
+
+        // normal second
+        mirror(ctx, videoWidth)
 
           if (currentArmState === armStates[0]) {
             drawText(50, 50, "Move arm outside", 24, colour1, SCALE, ctx)
@@ -257,11 +344,11 @@ function App() {
           }
           
           drawRepetitions(ctx, canvas)
+
           determineExerciseState(pose[0]["keypoints"][5].x, pose[0]["keypoints"][9].x)     
-          // Check if arm is located aside body, warn if not
-          isArmAside(pose[0]["keypoints"][5], pose[0]["keypoints"][7], ctx, canvas)
+          
           //isShoulderStationary(pose[0]["keypoints"][5], pose[0]["keypoints"][6], ctx)
-          isWristAlgned(pose[0]["keypoints"][7], pose[0]["keypoints"][9], ctx, canvas)
+          
           
           break;
         case "finish":
@@ -278,25 +365,7 @@ function App() {
       
     };
 
-    // // Get display size
-    
-  function useWindowSize() {
-    
-    useLayoutEffect(() => {
-      function updateSize() {
-        setSize([window.innerWidth, window.innerHeight]);
-      }
-      window.addEventListener('resize', updateSize);
-      updateSize();
-      return () => window.removeEventListener('resize', updateSize);
-    }, []);
-    return size;
-  }
-
-  // function ShowWindowDimensions(props) {
-  //   const [width, height] = useWindowSize();
-  //   return <span>Window size: {width} x {height}</span>;
-  // }
+  
 
     
 
@@ -325,15 +394,18 @@ function App() {
         <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
       </MetaTags> */}
 
+
+      {/* THrows error!!!!! */}
       <Helmet>
           <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
-          <title>Prototype exercise 1.0.1</title>
+          <title>Prototype exercise 1.0.2</title>
           {/* <link rel="canonical" href="http://mysite.com/example" /> */}
       </Helmet>
 
       <MediaQuery minWidth={1224}>
         <Webcam
               ref={webcamRef}
+              mirrored
               style={{
                 position: "absolute",
                 marginLeft: "auto",
@@ -374,6 +446,7 @@ function App() {
       <MediaQuery maxWidth={640}>
         <Webcam
               ref={webcamRef}
+              mirrored
               style={{
                 position: "absolute",
                 marginLeft: "auto",
@@ -382,8 +455,8 @@ function App() {
                 right: 0,
                 textAlign: "center",
                 zindex: 9,
-                width: vWidth * 0.8,
-                height: vHeight * 0.8,
+                width: (WIDTH * (vWidth / WIDTH)) * 0.8,
+                height: (HEIGHT * (vHeight / HEIGHT)) * 0.8,
               }}
             />
 
@@ -397,8 +470,9 @@ function App() {
             right: 0,
             textAlign: "center",
             zindex: 9,
-            width: vWidth * 0.8,
-            height: vHeight * 0.8,
+            width: (WIDTH * (vWidth / WIDTH)) * 0.8,
+            height: (HEIGHT * (vHeight / HEIGHT)) * 0.8,
+            
           }}
       />
 
