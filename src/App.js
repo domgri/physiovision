@@ -10,7 +10,7 @@ import '@tensorflow/tfjs-backend-webgl';
 
 import Webcam from "react-webcam";
 
-import { drawKeypoints, drawSkeleton, drawSpecific, drawSegment, drawText, drawCircle } from "./utilities";
+import { drawKeypoints, drawSkeleton, drawSpecific, drawSegment, drawText, drawCircle, drawPoint } from "./utilities";
 
 import FPSStats from "react-fps-stats"
 
@@ -224,7 +224,8 @@ function App() {
         case "setup":
           
           // Exercise specific keypoints
-          drawSpecific(pose[0]["keypoints"], 0.3, ctx)
+          //drawSpecific(pose[0]["keypoints"], 0.3, ctx)
+          drawPoint(ctx, pose[0]["keypoints"][9].y * 1, pose[0]["keypoints"][9].x * 1, 3, "aqua");
 
           drawText(50, 50, "Put left palm on your body where a circle is to begin", 24, colour1, SCALE, ctx)
 
