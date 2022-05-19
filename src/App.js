@@ -2,7 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import './css.css';
 
-import React, { useRef, useState, useEffect} from "react";
+import React, { useRef, useState, useEffect, useLayoutEffect} from "react";
 import * as poseDetection from '@tensorflow-models/pose-detection';
 import * as tf from '@tensorflow/tfjs-core';
 // Register one of the TF.js backends.
@@ -35,8 +35,11 @@ function App() {
 
   var list = []
 
-  var videoWidth = 640
-  var videoHeight = 480
+  var vWidth = window.innerWidth;
+  var vHeight = window.innerHeight;
+
+  const [size, setSize] = useState([0, 0]);
+  
 
   //console.log(appState)
 
@@ -205,8 +208,8 @@ function App() {
 
         // Get Video Properties
         const video = webcamRef.current.video;
-        videoWidth = webcamRef.current.video.videoWidth;
-        videoHeight = webcamRef.current.video.videoHeight;
+        const videoWidth = webcamRef.current.video.videoWidth;
+        const videoHeight = webcamRef.current.video.videoHeight;
 
         // Set video width
         webcamRef.current.video.width = videoWidth;
@@ -217,7 +220,7 @@ function App() {
       //var endTime = performance.now()
         //console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
     
-      console.log(videoWidth)
+      console.log(vWidth + " " + vHeight)
       drawCanvas(poses, video, videoWidth, videoHeight, canvasRef);
 
       }
@@ -275,11 +278,35 @@ function App() {
       
     };
 
-      // main
+    // // Get display size
+    
+  function useWindowSize() {
+    
+    useLayoutEffect(() => {
+      function updateSize() {
+        setSize([window.innerWidth, window.innerHeight]);
+      }
+      window.addEventListener('resize', updateSize);
+      updateSize();
+      return () => window.removeEventListener('resize', updateSize);
+    }, []);
+    return size;
+  }
 
+  // function ShowWindowDimensions(props) {
+  //   const [width, height] = useWindowSize();
+  //   return <span>Window size: {width} x {height}</span>;
+  // }
+
+    
+
+      // main
+      //const [width, height] = useWindowSize();
           
-      setupDetector()
+      setupDetector();
+      
       runDetection();
+      
 
       
 
@@ -291,6 +318,7 @@ function App() {
   }
 
   return (
+    
     <div className="App">
       <header className="App-header">
       {/* <MetaTags>
@@ -354,8 +382,8 @@ function App() {
                 right: 0,
                 textAlign: "center",
                 zindex: 9,
-                width: 320,
-                height: 240,
+                width: vWidth * 0.8,
+                height: vHeight * 0.8,
               }}
             />
 
@@ -369,8 +397,8 @@ function App() {
             right: 0,
             textAlign: "center",
             zindex: 9,
-            width: 320,
-            height: 240,
+            width: vWidth * 0.8,
+            height: vHeight * 0.8,
           }}
       />
 
