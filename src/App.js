@@ -19,6 +19,7 @@ import FPSStats from "react-fps-stats"
 import {Helmet} from "react-helmet";
 
 import MediaQuery from 'react-responsive'
+import { getByPlaceholderText } from '@testing-library/react';
 
 
   // // Get display size
@@ -358,6 +359,7 @@ function App() {
           setAppState("stop")
           currentExerciseState = exerciseStates[2]
           clearInterval(interval)
+          setGlobalState("finish")
 
           break;
         default:
@@ -387,21 +389,37 @@ function App() {
 
   function PreStartState(props) {
     return (<div><h1>Left shoulder external rotation</h1>
-     <button  onClick={() => {setGlobalState("crossroad")}}> Begin exercise</button>
+     <button  onClick={() => {setGlobalState("crossroad")}}> Try now</button>
      </div>);
   }
 
+  
   function CrossroadState(props) {
     return (<div><h1>Crossroad</h1>
-     <button  onClick={() => {setGlobalState("tutorial")}}>  Tutorial</button>
+    <div>
+    <button  onClick={() => {setGlobalState("tutorial");}}>  Exercise Tutorial </button>
+    </div>
+     
      <button  onClick={() => {setGlobalState("device-tutorial")}}> Where to put device?</button>
      <button  onClick={() => {setGlobalState("exercise"); setAppState("run")}}> Start exercise</button>
      </div>);
   }
 
+
+  // for auto play https://stackoverflow.com/questions/37463832/how-to-play-pause-video-in-react-without-external-library
+
+  // const vidRef = useRef(null);
+  // const handlePlayVideo = () => {
+  //   console.log(vidRef)
+  //   vidRef.current.play();
+  // }
+
   function TutorialState(props) {
     return (<div><h1>Tutorial</h1>
-     <button  onClick={() => {setGlobalState("crossroad2")}}> Skip</button>
+    <div>
+    <video src="/tutorials/placeholder.mp4" controls="controls" type="video/mp4"></video>
+    </div>
+     <button  onClick={() => {setGlobalState("crossroad2")}}> Continue</button>
      </div>);
   }
 
@@ -414,7 +432,10 @@ function App() {
 
   function DeviceTutorialState(props) {
     return (<div><h1>DeviceTutorial</h1>
-     <button  onClick={() => {setGlobalState("exercise"); setAppState("run")}}> Begin</button>
+    <div>
+    <video src="/tutorials/placeholder.mp4" controls="controls" type="video/mp4"></video>
+    </div>
+     <button  onClick={() => {setGlobalState("exercise"); setAppState("run")}}> Begin exercise</button>
      </div>);
   }
 
@@ -470,7 +491,7 @@ function App() {
 
        
         <div id='button-exercise-desktop'>
-        <button  onClick={() => {setGlobalState("finish"); setAppState("stop"); currentExerciseState = exerciseStates[2]; clearInterval(interval); console.log("------" + interval)}}>
+        <button  onClick={() => {setGlobalState("finish"); setAppState("stop"); currentExerciseState = exerciseStates[2]; clearInterval(interval)}}>
         Finish now
         </button>
         </div> 
