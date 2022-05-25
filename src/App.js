@@ -78,8 +78,6 @@ function App() {
   const [screenHeight, setScreenHeight] = useState(0);
 
 
-  
-  
 
   //console.log(appState)
 
@@ -112,11 +110,15 @@ function App() {
 
     var interval = null;
 
+ 
+
+
 
 
 
 
     // functions
+
 
     function determineExerciseState(leftShoulderX, leftWristX) {
 
@@ -563,7 +565,9 @@ function App() {
 
   }
 
+
   function FinishState(props) {
+    
     return (<div><h1>Finish</h1>
      <button  onClick={() => {setGlobalState("pre-start")}}> Once again</button>
      </div>);
