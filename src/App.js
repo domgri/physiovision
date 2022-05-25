@@ -21,7 +21,6 @@ import {Helmet} from "react-helmet";
 import MediaQuery from 'react-responsive'
 
 
-
   // // Get display size
     
   // function getWindowDimensions() {
@@ -50,7 +49,8 @@ import MediaQuery from 'react-responsive'
 
 function App() {
   
-  
+  const [globalState, setGlobalState] = useState("pre-start");
+  const globalStates = ["pre-start", "crossroad", "tutorial", "crossroad2", "device-tutorial", "exercise", "finish"];
 
   const [appState, setAppState] = useState("stop");
 
@@ -72,6 +72,12 @@ function App() {
   const HEIGHT = 480
 
   const [size, setSize] = useState([0, 0]);
+
+  const [screenWidth, setScreenWidth] = useState(0);
+  const [screenHeight, setScreenHeight] = useState(0);
+
+
+  
   
 
   //console.log(appState)
@@ -194,9 +200,6 @@ function App() {
     }
 
 
-
-
-
     const setupDetector = async () => {
 
       //console.log("setupDetector A")
@@ -208,13 +211,11 @@ function App() {
     
     function runDetection() {
 
-      //console.log("runDetection A")
+      console.log(currentExerciseState)
 
       if (currentExerciseState == exerciseStates[2]) {
         return
       }
-
-      console.log("runDetection B")
 
       // if (detector === null) {
       //   return
@@ -222,6 +223,7 @@ function App() {
 
       interval = setInterval(() => {
         console.log("interval")
+        console.log(currentExerciseState)
 
         detect();
         
@@ -366,9 +368,6 @@ function App() {
     };
 
   
-
-    
-
       // main
       //const [width, height] = useWindowSize();
           
@@ -377,33 +376,111 @@ function App() {
       runDetection();
       
 
-      
-
-
   }
 
   function setExerciseState(state) {
     currentExerciseState = state
   }
 
-  return (
-    
-    <div className="App">
-      <header className="App-header">
-      {/* <MetaTags>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
-      </MetaTags> */}
+
+  // States of exercise pipeline
+
+  function PreStartState(props) {
+    return (<div><h1>Left shoulder external rotation</h1>
+     <button  onClick={() => {setGlobalState("crossroad")}}> Begin exercise</button>
+     </div>);
+  }
+
+  function CrossroadState(props) {
+    return (<div><h1>Crossroad</h1>
+     <button  onClick={() => {setGlobalState("tutorial")}}>  Tutorial</button>
+     <button  onClick={() => {setGlobalState("device-tutorial")}}> Where to put device?</button>
+     <button  onClick={() => {setGlobalState("exercise"); setAppState("run")}}> Start exercise</button>
+     </div>);
+  }
+
+  function TutorialState(props) {
+    return (<div><h1>Tutorial</h1>
+     <button  onClick={() => {setGlobalState("crossroad2")}}> Skip</button>
+     </div>);
+  }
+
+  function Crossroad2State(props) {
+    return (<div><h1>Crossroad2</h1>
+     <button  onClick={() => {setGlobalState("device-tutorial")}}> Where to put device?</button>
+     <button  onClick={() => {setGlobalState("exercise"); setAppState("run")}}> Start exercise</button>
+     </div>);
+  }
+
+  function DeviceTutorialState(props) {
+    return (<div><h1>DeviceTutorial</h1>
+     <button  onClick={() => {setGlobalState("exercise"); setAppState("run")}}> Begin</button>
+     </div>);
+  }
+
+  function ExerciseState(props) {
+    return (
+      <div>
+        
+
+<MediaQuery minWidth={767}>
+
+         <Webcam
+              ref={webcamRef}
+              mirrored
+              style={{
+                
+                  position: "absolute",
+                 marginLeft: "auto",
+                 marginRight: "auto",
+                  left: 0,
+                  right: 0,
+                   top: 100,
+                  // bottom: '50%',
+                textAlign: "center",
+                zindex: 9,
+                width: WIDTH,
+                height: HEIGHT,
+              }}
+            />
+
+        <canvas
+          ref={canvasRef}
+          style={{
+            
+              position: "absolute",
+             marginLeft: "auto",
+             marginRight: "auto",
+              left: 0,
+              right: 0,
+               top: 100,
+              // bottom: '50%',
+            textAlign: "center",
+            zindex: 9,
+            width: WIDTH,
+            height: HEIGHT,
+          }}
+      />
+
+        {/* <div id='button-exercise-desktop'>
+        <button  onClick={() => {setAppState("run")}}>
+        (Re)Start
+        </button>
+        </div>  */}
+
+       
+        <div id='button-exercise-desktop'>
+        <button  onClick={() => {setGlobalState("finish"); setAppState("stop"); currentExerciseState = exerciseStates[2]; clearInterval(interval); console.log("------" + interval)}}>
+        Finish now
+        </button>
+        </div> 
+        
+      </MediaQuery>
 
 
-      {/* THrows error!!!!! */}
-      <Helmet>
-          <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
-          <title>Prototype exercise 1.0.2</title>
-          {/* <link rel="canonical" href="http://mysite.com/example" /> */}
-      </Helmet>
 
-      <MediaQuery minWidth={1224}>
-        <Webcam
+      <MediaQuery maxWidth={767}>
+         <Webcam
               ref={webcamRef}
               mirrored
               style={{
@@ -412,10 +489,14 @@ function App() {
                 marginRight: "auto",
                 left: 0,
                 right: 0,
+                top: 100,
                 textAlign: "center",
                 zindex: 9,
-                width: 640,
-                height: 480,
+                width: WIDTH / 2,
+                height: HEIGHT / 2,
+                // width: (WIDTH * (vWidth / WIDTH)) * 0.8,
+                // height: (HEIGHT * (vHeight / HEIGHT)) * 0.8,
+
               }}
             />
 
@@ -427,24 +508,88 @@ function App() {
             marginRight: "auto",
             left: 0,
             right: 0,
+            top: 100,
             textAlign: "center",
             zindex: 9,
-            width: 640,
-            height: 480,
+            width: WIDTH / 2,
+            height: HEIGHT / 2,
+            
           }}
       />
 
-        <div id='button'>
+        {/* <div id='button'>
         <button  onClick={() => {setAppState("run")}}>
         (Re)Start
         </button>
-        </div>
+        </div>  */}
+
+      <div id='button-exercise-mobile'>
+        <button  onClick={() => {setGlobalState("finish"); setAppState("stop")}}>
+        Finish now
+        </button>
+        </div> 
 
 
       </MediaQuery>
 
-      <MediaQuery maxWidth={640}>
-        <Webcam
+
+
+      </div>
+
+      
+
+    );
+
+  }
+
+  function FinishState(props) {
+    return (<div><h1>Finish</h1>
+     <button  onClick={() => {setGlobalState("pre-start")}}> Once again</button>
+     </div>);
+  }
+ 
+
+
+  return (
+    
+    <div className="App">
+      <header className="App-header">
+
+      {/* THrows error!!!!!
+      <Helmet>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+          <title>Prototype exercise 1.0.2</title>
+         
+      </Helmet> */}
+
+      <div style={{display : globalState === 'pre-start' ? 'block' : 'none'}}>
+      <PreStartState/>
+      </div>
+      <div style={{display : globalState === 'crossroad' ? 'block' : 'none'}}>
+      <CrossroadState/>
+      </div>
+      <div style={{display : globalState === 'tutorial' ? 'block' : 'none'}}>
+      <TutorialState/>
+      </div>
+      <div style={{display : globalState === 'device-tutorial' ? 'block' : 'none'}}>
+      <DeviceTutorialState/>
+      </div>
+      <div style={{display : globalState === 'crossroad2' ? 'block' : 'none'}}>
+      <Crossroad2State/>
+      </div>
+      <div id="middle" style={{display : globalState === 'exercise' ? 'block' : 'none'}}>
+      <ExerciseState/>
+      </div>
+      <div style={{display : globalState === 'finish' ? 'block' : 'none'}}>
+      <FinishState/>
+      </div>
+         
+     
+
+
+      {/* <MediaQuery minWidth={767}>
+
+         <Webcam
               ref={webcamRef}
               mirrored
               style={{
@@ -455,8 +600,8 @@ function App() {
                 right: 0,
                 textAlign: "center",
                 zindex: 9,
-                width: (WIDTH * (vWidth / WIDTH)) * 0.8,
-                height: (HEIGHT * (vHeight / HEIGHT)) * 0.8,
+                width: WIDTH,
+                height: HEIGHT,
               }}
             />
 
@@ -470,8 +615,53 @@ function App() {
             right: 0,
             textAlign: "center",
             zindex: 9,
-            width: (WIDTH * (vWidth / WIDTH)) * 0.8,
-            height: (HEIGHT * (vHeight / HEIGHT)) * 0.8,
+            width: WIDTH,
+            height: HEIGHT,
+          }}
+      />
+
+        
+        <div id='button'>
+        <button  onClick={() => {setAppState("run")}}>
+        (Re)Start
+        </button>
+        </div> 
+      </MediaQuery> */}
+
+
+
+      {/* <MediaQuery maxWidth={767}>
+         <Webcam
+              ref={webcamRef}
+              mirrored
+              style={{
+                position: "absolute",
+                marginLeft: "auto",
+                marginRight: "auto",
+                left: 0,
+                right: 0,
+                textAlign: "center",
+                zindex: 9,
+                width: WIDTH / 2,
+                height: HEIGHT / 2,
+                // width: (WIDTH * (vWidth / WIDTH)) * 0.8,
+                // height: (HEIGHT * (vHeight / HEIGHT)) * 0.8,
+
+              }}
+            />
+
+        <canvas
+          ref={canvasRef}
+          style={{
+            position: "absolute",
+            marginLeft: "auto",
+            marginRight: "auto",
+            left: 0,
+            right: 0,
+            textAlign: "center",
+            zindex: 9,
+            width: WIDTH / 2,
+            height: HEIGHT / 2,
             
           }}
       />
@@ -480,10 +670,10 @@ function App() {
         <button  onClick={() => {setAppState("run")}}>
         (Re)Start
         </button>
-        </div>
+        </div> 
 
 
-      </MediaQuery>
+      </MediaQuery> */}
 
         
 
