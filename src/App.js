@@ -22,33 +22,10 @@ import MediaQuery from 'react-responsive'
 import { getByPlaceholderText } from '@testing-library/react';
 
 
-  // // Get display size
-    
-  // function getWindowDimensions() {
-  //   const { innerWidth: width, innerHeight: height } = window;
-  //   return {
-  //     width,
-  //     height
-  //   };
-  // }
-  
-  //  function useWindowDimensions() {
-  //   const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
-  
-  //   useEffect(() => {
-  //     function handleResize() {
-  //       setWindowDimensions(getWindowDimensions());
-  //     }
-  
-  //     window.addEventListener('resize', handleResize);
-  //     return () => window.removeEventListener('resize', handleResize);
-  //   }, []);
-  
-  //   return windowDimensions;
-  // }
-
-
 function App() {
+
+  console.log("app")
+  
   
   const [globalState, setGlobalState] = useState("pre-start");
   const globalStates = ["pre-start", "crossroad", "tutorial", "crossroad2", "device-tutorial", "exercise", "finish"];
@@ -66,9 +43,6 @@ function App() {
     var vWidth = window.innerWidth;
     var vHeight = window.innerHeight;
 
-  //const {vWidth, vHeight} = useWindowDimensions();
-  console.log(vWidth)
-
   const WIDTH = 640
   const HEIGHT = 480
 
@@ -78,18 +52,17 @@ function App() {
   const [screenHeight, setScreenHeight] = useState(0);
 
 
+  const REPETITIONS = 10
 
-  //console.log(appState)
+  var setupReady = false;
+  const [working, setWorking] = useState(false)
+
 
   if (appState == "run") {
-
-    //console.log(appState + " run")
 
     const detectorConfig = {modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER};
 
     var detector = null;
-
-    
 
     var currentExerciseState = "setup";
     var currentArmState = "inside";
@@ -103,21 +76,18 @@ function App() {
     const PX_THRESHOLD = 10
     const SCALE = 1
 
-    const REPETITIONS = 10
+
 
     const colour1 = "#F5CAC3"
     const colour2 = "#F7EDE2"
 
     var interval = null;
 
- 
-
-
-
 
 
 
     // functions
+
 
 
     function determineExerciseState(leftShoulderX, leftWristX) {
@@ -129,6 +99,7 @@ function App() {
       }
       else if ((leftWristX < leftShoulderX)  && (currentArmState != "inside")) {
         currentArmState = "inside";
+
 
         count += 1;
 
@@ -146,7 +117,9 @@ function App() {
 
     }
 
-    const isArmAside = async (leftShoulder, leftElbow, ctx, canvas, videoWidth) => {
+    //const isArmAside = async (leftShoulder, leftElbow, ctx, canvas, videoWidth) {
+    
+    function isArmAside (leftShoulder, leftElbow, ctx, canvas, videoWidth) {
     
       if (Math.abs(leftShoulder.x - leftElbow.x) > PX_THRESHOLD * 5) {
 
@@ -158,12 +131,16 @@ function App() {
 
         mirror(ctx, videoWidth)
 
+        return false
+
       }
+
+      return true
 
     }
 
 
-    const isWristAlgned = async (leftElbow, leftWrist, ctx, canvas, videoWidth) => {
+    function isWristAlgned (leftElbow, leftWrist, ctx, canvas, videoWidth) {
       
       if (Math.abs(leftElbow.y - leftWrist.y) > PX_THRESHOLD * 5) {
 
@@ -175,7 +152,11 @@ function App() {
 
         mirror(ctx, videoWidth)
 
+        return false
+
       }
+
+      return true
     }
 
     function isReadyToStart(leftShoulder, rightShoulder, leftElbow, leftWrist,  ctx) {
@@ -205,42 +186,33 @@ function App() {
 
     const setupDetector = async () => {
 
-      //console.log("setupDetector A")
-
       detector = await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet, detectorConfig);
-      //console.log("setupDetector B")
+      setupReady = true;
     
     }
     
     function runDetection() {
 
-      console.log(currentExerciseState)
+      if (!setupReady) {
+        return
+      }
 
       if (currentExerciseState == exerciseStates[2]) {
         return
       }
 
-      // if (detector === null) {
-      //   return
-      // }
-
       interval = setInterval(() => {
-        console.log("interval")
-        console.log(currentExerciseState)
+        //console.log("interval")
 
         detect();
         
       }, 1000/FPS);
 
         
-    
-
-      //clearInterval(interval)
     }
 
     const detect = async () => {
 
-      //console.log("detect A")
 
       if (detector === null) {
         return
@@ -285,6 +257,11 @@ function App() {
     }
 
 
+    var wristError = false
+    var upperArmError = false
+
+    
+
     function drawCanvas (pose, video, videoWidth, videoHeight, canvas) {
       const ctx = canvas.current.getContext("2d");
       //const ctxEx = canvas.current.getContext("2d");
@@ -297,7 +274,8 @@ function App() {
       
       
       
-
+      wristError = false
+      upperArmError = false
 
 
       
@@ -331,9 +309,9 @@ function App() {
         mirror(ctx, videoWidth)
 
         // Check if arm is located aside body, warn if not
-        isArmAside(pose[0]["keypoints"][5], pose[0]["keypoints"][7], ctx, canvas, videoWidth)
+        upperArmError = isArmAside(pose[0]["keypoints"][5], pose[0]["keypoints"][7], ctx, canvas, videoWidth)
         
-        isWristAlgned(pose[0]["keypoints"][7], pose[0]["keypoints"][9], ctx, canvas, videoWidth)
+        wristError = isWristAlgned(pose[0]["keypoints"][7], pose[0]["keypoints"][9], ctx, canvas, videoWidth)
 
 
 
@@ -341,18 +319,20 @@ function App() {
         // normal second
         mirror(ctx, videoWidth)
 
-          if (currentArmState === armStates[0]) {
-            drawText(50, 50, "Move arm outside", 24, colour1, SCALE, ctx)
+        if (currentArmState === armStates[0]) {
+          drawText(50, 50, "Move arm outside", 24, colour1, SCALE, ctx)
 
-          } else {
-            drawText(50, 50, "Move arm inside", 24, colour1, SCALE, ctx)
-          }
-          
-          drawRepetitions(ctx, canvas)
+        } else {
+          drawText(50, 50, "Move arm inside", 24, colour1, SCALE, ctx)
+        }
+        
+        // storeExerciseErrors(count, wristError, upperArmError)
+        
+        drawRepetitions(ctx, canvas)
 
-          determineExerciseState(pose[0]["keypoints"][5].x, pose[0]["keypoints"][9].x)     
-          
-          //isShoulderStationary(pose[0]["keypoints"][5], pose[0]["keypoints"][6], ctx)
+        determineExerciseState(pose[0]["keypoints"][5].x, pose[0]["keypoints"][9].x)     
+        
+        //isShoulderStationary(pose[0]["keypoints"][5], pose[0]["keypoints"][6], ctx)
           
           
           break;
@@ -372,12 +352,22 @@ function App() {
     };
 
   
-      // main
-      //const [width, height] = useWindowSize();
+     
           
-      setupDetector();
+     const run = async () => { 
+        if (working) {
+          return
+        }
+        setWorking(true)
+        await setupDetector();
+        runDetection();
+        
+      }
+
+      // main
+
+      run();
       
-      runDetection();
       
 
   }
@@ -567,9 +557,16 @@ function App() {
 
 
   function FinishState(props) {
+
+    // if (globalState == "finish") {
+    //   setExerciseErrors(exerciseInformation.getDetails())
+    // }
+   
     
     return (<div><h1>Finish</h1>
-     <button  onClick={() => {setGlobalState("pre-start")}}> Once again</button>
+    {/*exerciseErrors*/}
+     {/* <button  onClick={() => {setGlobalState("pre-start"); count = 0; setExerciseState(exerciseStates[0]) }}> Once again</button> */}
+     <button  onClick={() => {window.location.reload(false);}}> Once again</button>
      </div>);
   }
  
