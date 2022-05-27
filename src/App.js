@@ -24,7 +24,6 @@ import { getByPlaceholderText } from '@testing-library/react';
 
 function App() {
 
-  console.log("app")
   
   
   const [globalState, setGlobalState] = useState("pre-start");
@@ -78,10 +77,12 @@ function App() {
 
 
 
-    const colour1 = "#F5CAC3"
-    const colour2 = "#F7EDE2"
+    const colour1 = "#d99f4c"
+    const colour2 = "#1eddff"
 
     var interval = null;
+
+
 
 
 
@@ -238,10 +239,6 @@ function App() {
       //var endTime = performance.now()
         //console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
     
-      console.log(vWidth + " " + vHeight)
-      console.log(WIDTH+ " " + HEIGHT)
-      console.log(WIDTH * (vWidth / WIDTH)+ " " + HEIGHT * (vHeight / HEIGHT))
-      console.log("--")
 
 
 
@@ -297,7 +294,7 @@ function App() {
         // normal second
         mirror(ctx, videoWidth)
 
-        drawText(50, 50, "Put left palm on your body where a circle is to begin", 24, colour1, SCALE, ctx)
+        drawText(50, 50, "Put left palm on your body where a circle is to begin", 18, colour1, SCALE, ctx)
 
 
           
@@ -409,7 +406,7 @@ function App() {
   function TutorialState(props) {
     return (<div><h1>Tutorial</h1>
     <div>
-    <video src="/tutorials/leftshoulder.mp4" controls="controls" type="video/mp4"></video>
+    <video style={{width: "75%"}} src="/tutorials/leftshoulder.mp4" controls="controls" type="video/mp4"></video>
     </div>
      <button  onClick={() => {setGlobalState("crossroad2")}}> Continue</button>
      </div>);
@@ -425,7 +422,7 @@ function App() {
   function DeviceTutorialState(props) {
     return (<div><h1>DeviceTutorial</h1>
     <div>
-    <video src="/tutorials/device.mp4" controls="controls" type="video/mp4"></video>
+    <video style={{width: "75%"}} src="/tutorials/device.mp4" controls="controls" type="video/mp4"></video>
     </div>
      <button  onClick={() => {setGlobalState("exercise"); setAppState("run")}}> Begin exercise</button>
      </div>);
@@ -483,7 +480,7 @@ function App() {
 
        
         <div id='button-exercise-desktop'>
-        <button  onClick={() => {setGlobalState("finish"); setAppState("stop"); currentExerciseState = exerciseStates[2]; clearInterval(interval)}}>
+        <button  onClick={() => {setGlobalState("finish"); setAppState("stop"); currentExerciseState = exerciseStates[2]; clearInterval(interval); }}>
         Finish now
         </button>
         </div> 
@@ -561,10 +558,11 @@ function App() {
     // if (globalState == "finish") {
     //   setExerciseErrors(exerciseInformation.getDetails())
     // }
-   
+    // globalState === "exercise" ? setWrists(calculateWrists) : console.log("no")
     
     return (<div><h1>Finish</h1>
     {/*exerciseErrors*/}
+    {/* { globalState === "exercise" ? setWrists(calculateWrists) : console.log("no")} */}
      {/* <button  onClick={() => {setGlobalState("pre-start"); count = 0; setExerciseState(exerciseStates[0]) }}> Once again</button> */}
      <button  onClick={() => {window.location.reload(false);}}> Once again</button>
      </div>);
