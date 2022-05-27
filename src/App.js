@@ -409,7 +409,7 @@ function App() {
   function TutorialState(props) {
     return (<div><h1>Tutorial</h1>
     <div>
-    <video src="/tutorials/placeholder.mp4" controls="controls" type="video/mp4"></video>
+    <video src="/tutorials/leftshoulder.mp4" controls="controls" type="video/mp4"></video>
     </div>
      <button  onClick={() => {setGlobalState("crossroad2")}}> Continue</button>
      </div>);
@@ -425,7 +425,7 @@ function App() {
   function DeviceTutorialState(props) {
     return (<div><h1>DeviceTutorial</h1>
     <div>
-    <video src="/tutorials/placeholder.mp4" controls="controls" type="video/mp4"></video>
+    <video src="/tutorials/device.mp4" controls="controls" type="video/mp4"></video>
     </div>
      <button  onClick={() => {setGlobalState("exercise"); setAppState("run")}}> Begin exercise</button>
      </div>);
