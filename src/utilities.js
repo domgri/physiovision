@@ -273,7 +273,7 @@
  export function drawText(width, height, text, fontSize = 24, colour = "#F5CAC3", scale = 1, ctx) {
   
   //const fontSize = 48;
-  ctx.font = fontSize + 'px serif';
+  ctx.font = fontSize + 'px verdana';
   ctx.fillStyle = colour;
   ctx.fillText(text, width - fontSize, height);
   
