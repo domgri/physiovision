@@ -40,7 +40,6 @@
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "react-fps-stats": "^0.2.3",
-    "react-helmet": "^6.1.0",
     "react-responsive": "^9.0.0-beta.8",
     "react-scripts": "5.0.1",
     "react-webcam": "^7.0.1",
