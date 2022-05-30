@@ -2,7 +2,7 @@
 import React, { useRef, useState, useEffect, useLayoutEffect} from "react";
 
 import * as poseDetection from '@tensorflow-models/pose-detection';
-import { drawKeypoints, drawSkeleton, drawSpecific, drawSegment, drawText, drawCircle, drawPoint } from "./../utilities";
+import { drawKeypoints, drawSkeleton, drawSpecific, drawSegment, drawText, drawCircle, drawPoint } from "../utilities";
 import Webcam from "react-webcam";
 import MediaQuery from 'react-responsive'
 import FPSStats from "react-fps-stats"
