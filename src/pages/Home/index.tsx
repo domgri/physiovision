@@ -5,14 +5,16 @@ import AboutContent from "../../content/AboutContent.json";
 import MissionContent from "../../content/MissionContent.json";
 import ProductContent from "../../content/ProductContent.json";
 import ContactContent from "../../content/ContactContent.json";
+//import ShoulderExercise from  "../../exercises/ShoulderExercise";
 
 const Contact = lazy(() => import("../../components/ContactForm"));
 const MiddleBlock = lazy(() => import("../../components/MiddleBlock"));
+const MiddleBlockExercise = lazy(() => import("../../components/MiddleBlockExercise"));
 const Container = lazy(() => import("../../common/Container"));
 const ScrollToTop = lazy(() => import("../../common/ScrollToTop"));
 const ContentBlock = lazy(() => import("../../components/ContentBlock"));
 
-const ShoulderExercise = lazy(() => import ("../../exercises/ShoulderExercise"))
+
 
 const Home = () => {
   return (
@@ -27,7 +29,12 @@ const Home = () => {
         id="intro"
       />
 
-      <ShoulderExercise />
+
+      <MiddleBlockExercise
+        title={"title"}
+        content={"content"}
+        button={"button"}
+      />
       
       <MiddleBlock
         title={MiddleBlockContent.title}

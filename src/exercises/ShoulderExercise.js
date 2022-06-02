@@ -2,6 +2,8 @@
 import React, { useRef, useState, useEffect, useLayoutEffect} from "react";
 
 import * as poseDetection from '@tensorflow-models/pose-detection';
+import '@tensorflow/tfjs-backend-webgl';
+
 import { drawKeypoints, drawSkeleton, drawSpecific, drawSegment, drawText, drawCircle, drawPoint } from "./utilities";
 import Webcam from "react-webcam";
 import MediaQuery from 'react-responsive'
@@ -18,6 +20,8 @@ function ShoulderExercise() {
 
    const exerciseStates = ["setup", "run", "finish"]
    const armStates = ["inside", "outside"]
+
+  const [webcamEnabled, setWebcamEnabled] = useState(false); 
 
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
@@ -375,7 +379,7 @@ function ShoulderExercise() {
     </div>
      
      <button  onClick={() => {setGlobalState("device-tutorial")}}> Where to put device?</button>
-     <button  onClick={() => {setGlobalState("exercise"); setAppState("run")}}> Start exercise</button>
+     <button  onClick={() => {setGlobalState("exercise"); setAppState("run"); setWebcamEnabled(true)}}> Start exercise</button>
      </div>);
   }
 
@@ -400,7 +404,7 @@ function ShoulderExercise() {
   function Crossroad2State(props) {
     return (<div><h1>Crossroad2</h1>
      <button  onClick={() => {setGlobalState("device-tutorial")}}> Where to put device?</button>
-     <button  onClick={() => {setGlobalState("exercise"); setAppState("run")}}> Start exercise</button>
+     <button  onClick={() => {setGlobalState("exercise"); setAppState("run");  setWebcamEnabled(true)}}> Start exercise</button>
      </div>);
   }
 
@@ -416,65 +420,60 @@ function ShoulderExercise() {
   function ExerciseState(props) {
     return (
       <div>
-        
 
-<MediaQuery minWidth={767}>
 
-         <Webcam
-              ref={webcamRef}
-              mirrored
-              style={{
-                
-                  position: "absolute",
-                 marginLeft: "auto",
-                 marginRight: "auto",
-                  left: 0,
-                  right: 0,
-                   top: 100,
-                  // bottom: '50%',
-                textAlign: "center",
-                zindex: 9,
-                width: WIDTH,
-                height: HEIGHT,
-              }}
-            />
+      {webcamEnabled ? (
+
+        <>
+        <MediaQuery minWidth={768}>
+
+        <Webcam
+            ref={webcamRef}
+            mirrored
+            style={{
+              
+                position: "absolute",
+                marginLeft: "auto",
+                marginRight: "auto",
+                left: 0,
+                right: 0,
+                  top: 100,
+                // bottom: '50%',
+              textAlign: "center",
+              zindex: 9,
+              width: WIDTH,
+              height: HEIGHT,
+            }}
+          />
 
         <canvas
-          ref={canvasRef}
-          style={{
-            
-              position: "absolute",
-             marginLeft: "auto",
-             marginRight: "auto",
-              left: 0,
-              right: 0,
-               top: 100,
-              // bottom: '50%',
-            textAlign: "center",
-            zindex: 9,
-            width: WIDTH,
-            height: HEIGHT,
-          }}
-      />
+        ref={canvasRef}
+        style={{
+          
+            position: "absolute",
+            marginLeft: "auto",
+            marginRight: "auto",
+            left: 0,
+            right: 0,
+              top: 100,
+            // bottom: '50%',
+          textAlign: "center",
+          zindex: 9,
+          width: WIDTH,
+          height: HEIGHT,
+        }}
+        />
 
-        {/* <div id='button-exercise-desktop'>
-        <button  onClick={() => {setAppState("run")}}>
-        (Re)Start
-        </button>
-        </div>  */}
-
-       
         <div id='button-exercise-desktop'>
         <button  onClick={() => {setGlobalState("finish"); setAppState("stop"); currentExerciseState = exerciseStates[2]; clearInterval(interval); }}>
-        Finish now
+        Finish now1
         </button>
         </div> 
+
+        </MediaQuery>
+
         
-      </MediaQuery>
-
-
-
-      <MediaQuery maxWidth={767}>
+        <MediaQuery maxWidth={767}>
          <Webcam
               ref={webcamRef}
               mirrored
@@ -512,22 +511,20 @@ function ShoulderExercise() {
           }}
       />
 
-        {/* <div id='button'>
-        <button  onClick={() => {setAppState("run")}}>
-        (Re)Start
-        </button>
-        </div>  */}
-
       <div id='button-exercise-mobile'>
         <button  onClick={() => {setGlobalState("finish"); setAppState("stop")}}>
-        Finish now
+        Finish now2
         </button>
         </div> 
 
 
       </MediaQuery>
 
+</>
+          
 
+
+      ) : ""}  
 
       </div>
 
