@@ -11,7 +11,6 @@ import FPSStats from "react-fps-stats"
 
 function ShoulderExercise() {
 
-    
   
   const [globalState, setGlobalState] = useState("pre-start");
   const globalStates = ["pre-start", "crossroad", "tutorial", "crossroad2", "device-tutorial", "exercise", "finish"];
@@ -423,15 +422,15 @@ function ShoulderExercise() {
 
 
       {webcamEnabled ? (
-
         <>
+        <div style={{width : WIDTH}}>
         <MediaQuery minWidth={768}>
 
         <Webcam
             ref={webcamRef}
             mirrored
             style={{
-              
+                
                 position: "absolute",
                 marginLeft: "auto",
                 marginRight: "auto",
@@ -471,6 +470,9 @@ function ShoulderExercise() {
         </div> 
 
         </MediaQuery>
+        </div>
+        
+        <div style={{width : WIDTH/2}}>
 
         
         <MediaQuery maxWidth={767}>
@@ -520,7 +522,8 @@ function ShoulderExercise() {
 
       </MediaQuery>
 
-</>
+      </div>
+      </>
           
 
 
