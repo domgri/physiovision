@@ -9,6 +9,16 @@ import Webcam from "react-webcam";
 import MediaQuery from 'react-responsive'
 import FPSStats from "react-fps-stats"
 
+
+import { Button } from "../common/Button";
+
+import { Row, Col } from 'antd';
+
+import { lazy } from "react";
+const Container = lazy(() => import("../common/Container"));
+
+
+
 function ShoulderExercise() {
 
   
@@ -365,20 +375,33 @@ function ShoulderExercise() {
   // States of exercise pipeline
 
   function PreStartState(props) {
-    return (<div><h1>Left shoulder external rotation</h1>
-     <button  onClick={() => {setGlobalState("crossroad")}}> Try now</button>
+    return (<div><h6>Left shoulder external rotation</h6>
+     <Button onClick={() => {setGlobalState("crossroad")}}> Try now</Button>
      </div>);
+
   }
 
   
   function CrossroadState(props) {
-    return (<div><h1>Crossroad</h1>
-    <div>
-    <button  onClick={() => {setGlobalState("tutorial");}}>  Exercise Tutorial </button>
-    </div>
+    return (<div><h6>Watch tutorial or start straight away?</h6>
+    
+    <Row>
+    <Col xs={24} lg={8}>
+    <Button  color="#fff"  onClick={() => {setGlobalState("tutorial");}}>  Exercise Tutorial </Button>
+    </Col>
+    <Col xs={24} lg={8}>
+    <Button  color="#fff"  onClick={() => {setGlobalState("device-tutorial")}}> Where to put device?</Button>
+    </Col>
+    <Col xs={24} lg={8}>
+    <Button  onClick={() => {setGlobalState("exercise"); setAppState("run"); setWebcamEnabled(true)}}> Start!</Button>
+    </Col>
+  </Row>
+
+    
+    
      
-     <button  onClick={() => {setGlobalState("device-tutorial")}}> Where to put device?</button>
-     <button  onClick={() => {setGlobalState("exercise"); setAppState("run"); setWebcamEnabled(true)}}> Start exercise</button>
+     
+     
      </div>);
   }
 
@@ -392,27 +415,41 @@ function ShoulderExercise() {
   // }
 
   function TutorialState(props) {
-    return (<div><h1>Tutorial</h1>
+    return (<div><h6>Tutorial</h6>
+  
     <div>
     <video style={{width: "75%"}} src="/tutorials/leftshoulder.mp4" controls="controls" type="video/mp4"></video>
     </div>
-     <button  onClick={() => {setGlobalState("crossroad2")}}> Continue</button>
+
+    <Button  color="#fff"  onClick={() => {setGlobalState("crossroad2")}}> Continue</Button>
+
+
+     
      </div>);
   }
 
   function Crossroad2State(props) {
-    return (<div><h1>Crossroad2</h1>
-     <button  onClick={() => {setGlobalState("device-tutorial")}}> Where to put device?</button>
-     <button  onClick={() => {setGlobalState("exercise"); setAppState("run");  setWebcamEnabled(true)}}> Start exercise</button>
+    return (<div><h6>Begin the exercise?</h6>
+
+    <Row>
+      <Col xs={24} lg={8}>
+      <Button  color="#fff"  onClick={() => {setGlobalState("device-tutorial")}}> Where to put device?</Button>
+      </Col>
+      <Col xs={24} lg={8}>
+      <Button  onClick={() => {setGlobalState("exercise"); setAppState("run");  setWebcamEnabled(true)}}> Yes!</Button>
+      </Col>
+    </Row>
+     
+    
      </div>);
   }
 
   function DeviceTutorialState(props) {
-    return (<div><h1>DeviceTutorial</h1>
+    return (<div><h6>DeviceTutorial</h6>
     <div>
     <video style={{width: "75%"}} src="/tutorials/device.mp4" controls="controls" type="video/mp4"></video>
     </div>
-     <button  onClick={() => {setGlobalState("exercise"); setAppState("run")}}> Begin exercise</button>
+     <Button  onClick={() => {setGlobalState("exercise"); setAppState("run"); setWebcamEnabled(true)}}> Begin exercise</Button>
      </div>);
   }
 
@@ -420,11 +457,12 @@ function ShoulderExercise() {
     return (
       <div>
 
-
       {webcamEnabled ? (
         <>
-        <div style={{width : WIDTH}}>
+
+        
         <MediaQuery minWidth={768}>
+        <div style={{width : WIDTH, height : HEIGHT}}>
 
         <Webcam
             ref={webcamRef}
@@ -463,19 +501,20 @@ function ShoulderExercise() {
         }}
         />
 
-        <div id='button-exercise-desktop'>
-        <button  onClick={() => {setGlobalState("finish"); setAppState("stop"); currentExerciseState = exerciseStates[2]; clearInterval(interval); }}>
-        Finish now1
-        </button>
-        </div> 
-
-        </MediaQuery>
-        </div>
         
-        <div style={{width : WIDTH/2}}>
+        <Button color="#fff"  onClick={() => {setGlobalState("finish"); setAppState("stop"); currentExerciseState = exerciseStates[2]; clearInterval(interval); }}>
+        Finish early
+        </Button>
+     
+        </div>
+        </MediaQuery>
+       
+        
+        
 
         
         <MediaQuery maxWidth={767}>
+        <div style={{width : WIDTH/2, height : HEIGHT/2}}>
          <Webcam
               ref={webcamRef}
               mirrored
@@ -514,19 +553,17 @@ function ShoulderExercise() {
       />
 
       <div id='button-exercise-mobile'>
-        <button  onClick={() => {setGlobalState("finish"); setAppState("stop")}}>
-        Finish now2
-        </button>
+        <Button color="#fff"  onClick={() => {setGlobalState("finish"); setAppState("stop")}}>
+        Finish early
+        </Button>
         </div> 
 
-
+        </div>
       </MediaQuery>
 
-      </div>
+      
       </>
-          
-
-
+        
       ) : ""}  
 
       </div>
@@ -545,21 +582,23 @@ function ShoulderExercise() {
     // }
     // globalState === "exercise" ? setWrists(calculateWrists) : console.log("no")
     
-    return (<div><h1>Finish</h1>
+    return (<div><h6>Finish</h6>
     {/*exerciseErrors*/}
     {/* { globalState === "exercise" ? setWrists(calculateWrists) : console.log("no")} */}
      {/* <button  onClick={() => {setGlobalState("pre-start"); count = 0; setExerciseState(exerciseStates[0]) }}> Once again</button> */}
-     <button  onClick={() => {window.location.reload(false);}}> Once again</button>
+     <Button  onClick={() => {window.location.reload(false);}}> Once again</Button>
      </div>);
   }
  
 
 
     return (
+      <>
 
+       
 
-        <div className="App">
-      <header className="App-header">
+         {/* <div className="App">
+       <header className="App-header"> */}
 
       {/* THrows error!!!!!
       <Helmet>
@@ -568,6 +607,9 @@ function ShoulderExercise() {
          
       </Helmet> */}
 
+
+       {/* <Container> */}
+      
       <div style={{display : globalState === 'pre-start' ? 'block' : 'none'}}>
       <PreStartState/>
       </div>
@@ -589,13 +631,18 @@ function ShoulderExercise() {
       <div style={{display : globalState === 'finish' ? 'block' : 'none'}}>
       <FinishState/>
       </div>
-
-      <FPSStats />
-
+      {/* </Container> */}
 
 
-    </header>
-    </div>
+
+      {/* <FPSStats /> */}
+
+      {/* </header>
+     </div> */}
+
+      </>
+
+     
     )
 }
 

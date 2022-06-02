@@ -25,8 +25,8 @@ export const Content = styled("p")`
 // `;
 
 export const ContentWrapper = styled("div")`
-  width: 640px;
-  height: 480px;
+
+  max-width: 640px;
 
   @media only screen and (max-width: 768px) {
     max-width: 100%;
