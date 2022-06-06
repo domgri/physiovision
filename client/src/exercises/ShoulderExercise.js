@@ -77,8 +77,8 @@ function ShoulderExercise() {
 
 
 
-    const colour1 = "#d99f4c"
-    const colour2 = "#1eddff"
+    const colour1 = "#FE7624"
+    const colour2 = "#2E186A"
 
     var interval = null;
 
@@ -588,12 +588,20 @@ function ShoulderExercise() {
     // }
     // globalState === "exercise" ? setWrists(calculateWrists) : console.log("no")
     
-    return (<div><h6>Finish</h6>
+    return (<div><h6><strong>Physioloop</strong></h6>
     {/*exerciseErrors*/}
     {/* { globalState === "exercise" ? setWrists(calculateWrists) : console.log("no")} */}
      {/* <button  onClick={() => {setGlobalState("pre-start"); count = 0; setExerciseState(exerciseStates[0]) }}> Once again</button> */}
-     <Button onClick={() => scrollTo("contact")}> Leave feedback</Button>
-     <Button color="#fff" onClick={() => {window.location.reload(false);}}> Once again</Button>
+     <Row>
+      <Col xs={24} lg={12}>
+      <Button onClick={() => scrollTo("contact")}> Leave feedback</Button>
+      </Col>
+      <Col xs={24} lg={12}>
+      <Button color="#fff" onClick={() => {window.location.reload(false);}}> Once again</Button>
+      </Col>
+    </Row>
+     
+     
      
      </div>);
   }

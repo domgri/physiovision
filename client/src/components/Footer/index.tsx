@@ -20,6 +20,7 @@ import {
   LanguageSwitch,
   LanguageSwitchContainer,
 } from "./styles";
+import { Content } from "antd/lib/layout/layout";
 
 interface SocialLinkProps {
   href: string;
@@ -143,8 +144,9 @@ const Footer = ({ t }: any) => {
                 />
               </LogoContainer>
             </NavLink>
-            {/* <FooterContainer>
-              <SocialLink
+            <FooterContainer>
+              <Content> Early access website. More to come soon...</Content>
+              {/* <SocialLink
                 href="https://github.com/Adrinlol/create-react-app-adrinlol"
                 src="github.svg"
               />
@@ -165,8 +167,8 @@ const Footer = ({ t }: any) => {
                   src="https://img.buymeacoffee.com/button-api/?text=Buy me a pizza&emoji=🍕&slug=adrinlol&button_colour=FF5F5F&font_colour=ffffff&font_family=Lato&outline_colour=000000&coffee_colour=FFDD00"
                   alt="Buy me a pizza"
                 />
-              </a>
-            </FooterContainer> */}
+              </a> */}
+            </FooterContainer>
           </Row>
         </Container>
       </Extra>
