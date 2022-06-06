@@ -4,11 +4,11 @@ const dotenv = require('dotenv');
 dotenv.config({ path: process.cwd() + '\\sendgrid.env' });
 
 var cors = require('cors')
-
 const PORT = process.env.PORT || 3001;
 
-const app = express();
+const path = require('path');
 
+const app = express();
 app.use(cors())
 
 
@@ -69,6 +69,17 @@ app.use(bodyParser.json());
       // console.error(error)
     })
   });
+
+// app.get("/", (req, res) => {
+//   res.render("index.html");
+// });
+
+app.get('/', (req, res) =>{
+  const location =  path.join(__dirname, "..", "client", "public");
+    res.sendFile('index.html', { root: location} );
+});
+
+
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
