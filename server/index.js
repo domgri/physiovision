@@ -74,10 +74,10 @@ app.use(bodyParser.json());
 //   res.render("index.html");
 // });
 
-app.get('/', (req, res) =>{
-  const location =  path.join(__dirname, "..", "client", "public");
-    res.sendFile('index.html', { root: location} );
-});
+// app.get('/', (req, res) =>{
+//   const location =  path.join(__dirname, "..", "client", "public");
+//     res.sendFile('index.html', { root: location} );
+// });
 
 
 
