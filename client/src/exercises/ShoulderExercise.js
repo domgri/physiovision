@@ -14,6 +14,8 @@ import { Button } from "../common/Button";
 
 import { Row, Col } from 'antd';
 
+import { Content } from "./styles";
+
 import { lazy } from "react";
 const Container = lazy(() => import("../common/Container"));
 
@@ -376,6 +378,7 @@ function ShoulderExercise() {
 
   function PreStartState(props) {
     return (<div><h6>Left shoulder external rotation</h6>
+      <Content>{"Open beta"}</Content>
      <Button onClick={() => {setGlobalState("crossroad")}}> Try now</Button>
      </div>);
 
@@ -432,10 +435,10 @@ function ShoulderExercise() {
     return (<div><h6>Begin the exercise?</h6>
 
     <Row>
-      <Col xs={24} lg={8}>
+      <Col xs={24} lg={12}>
       <Button  color="#fff"  onClick={() => {setGlobalState("device-tutorial")}}> Where to put device?</Button>
       </Col>
-      <Col xs={24} lg={8}>
+      <Col xs={24} lg={12}>
       <Button  onClick={() => {setGlobalState("exercise"); setAppState("run");  setWebcamEnabled(true)}}> Yes!</Button>
       </Col>
     </Row>
@@ -505,6 +508,7 @@ function ShoulderExercise() {
         <Button color="#fff"  onClick={() => {setGlobalState("finish"); setAppState("stop"); currentExerciseState = exerciseStates[2]; clearInterval(interval); }}>
         Finish early
         </Button>
+        <Content>{"You will be asked to allow camera access. Caputured data does not leave your browser."}</Content>
      
         </div>
         </MediaQuery>
@@ -553,9 +557,11 @@ function ShoulderExercise() {
       />
 
       <div id='button-exercise-mobile'>
+      
         <Button color="#fff"  onClick={() => {setGlobalState("finish"); setAppState("stop")}}>
         Finish early
         </Button>
+        <Content>{"You will be asked to allow camera access. Caputured data does not leave your browser."}</Content>
         </div> 
 
         </div>
@@ -586,9 +592,22 @@ function ShoulderExercise() {
     {/*exerciseErrors*/}
     {/* { globalState === "exercise" ? setWrists(calculateWrists) : console.log("no")} */}
      {/* <button  onClick={() => {setGlobalState("pre-start"); count = 0; setExerciseState(exerciseStates[0]) }}> Once again</button> */}
-     <Button  onClick={() => {window.location.reload(false);}}> Once again</Button>
+     <Button onClick={() => scrollTo("contact")}> Leave feedback</Button>
+     <Button color="#fff" onClick={() => {window.location.reload(false);}}> Once again</Button>
+     
      </div>);
   }
+
+  // UI function
+
+  const scrollTo = (id) => {
+    const element = document.getElementById(id);
+    element.scrollIntoView({
+      behavior: "smooth",
+    });
+  }
+
+//===
  
 
 

@@ -24,6 +24,7 @@ export const StyledSelect = styled("select")`
   cursor: pointer;
   max-width: 180px;
   transition: all 0.3s ease-in-out;
+  padding-left: 1.25rem;
 `;
 
 export const StyledOption = styled("option")`

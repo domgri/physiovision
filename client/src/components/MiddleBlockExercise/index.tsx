@@ -14,12 +14,13 @@ interface MiddleBlockExerciseProps {
   content: string;
   button: string;
   t: any;
+  id: string;
 
 }
 
 
 
-const MiddleBlockExercise = ({ title, content, button, t }: MiddleBlockExerciseProps) => {
+const MiddleBlockExercise = ({ title, content, button, t, id }: MiddleBlockExerciseProps) => {
   
   const scrollTo = (id: string) => {
     const element = document.getElementById(id) as HTMLDivElement;
@@ -33,7 +34,7 @@ const MiddleBlockExercise = ({ title, content, button, t }: MiddleBlockExerciseP
   return (
     <MiddleBlockSection>
       <Slide direction="up">
-        <Row justify="center" align="middle">
+        <Row justify="center" align="middle"  id={id}>
           <ContentWrapper>
             <Col lg={24} md={24} sm={24} xs={24}>
             <ShoulderExercise />
