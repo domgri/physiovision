@@ -1,0 +1,14 @@
+{
+  "title": "Exercise correctly with a help of your device",
+  "text": "An application provides real-time feedback on your exercise posture. Suitable for people rehabilitating from injuries/surgeries or ones that are unsure about the correctness of movements. ",
+  "button": [
+    {
+      "title": "Try Demo"
+    },
+    {
+      "title": "Ask a question",
+      "color": "#fff"
+    }
+  ]
+}
+
