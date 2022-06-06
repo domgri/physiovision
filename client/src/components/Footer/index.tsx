@@ -145,7 +145,7 @@ const Footer = ({ t }: any) => {
               </LogoContainer>
             </NavLink>
             <FooterContainer>
-              <Content> Early access website. More to come soon...</Content>
+              <Content> Early access website. More to come soon.</Content>
               {/* <SocialLink
                 href="https://github.com/Adrinlol/create-react-app-adrinlol"
                 src="github.svg"
