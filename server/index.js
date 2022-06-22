@@ -17,12 +17,14 @@ app.get("/api", (req, res) => {
     
   });
 
+
 app.post("/test", (req, res) => {
     res.json({ message: "Hello from server!" });
     
 });
 
 const bodyParser = require('body-parser');
+
 app.use(bodyParser.json());
   app.post("/form", (req, res) => {
 
@@ -66,7 +68,7 @@ app.use(bodyParser.json());
       res.end()
     })
     .catch((error) => {
-      // console.error(error)
+       console.error(error)
     })
   });
 
