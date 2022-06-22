@@ -1,8 +1,14 @@
-FROM node:alpine
-WORKDIR /app
-COPY package.json ./
-COPY package-lock.json ./
-COPY ./ ./
-RUN npm i
-RUN npm run build
-CMD ["npm", "run", "start"]
+# if smaller image needed, look into node:alpine
+FROM node 
+WORKDIR /client
+COPY package.json /client/
+RUN npm install
+COPY . /client/
+CMD ["npm", "start"]
+
+# to start a single docker container
+# docker run -d -p 8080:3000 --name react-app <name of built image (e.g. client-image)>
+# 3000 default reactjs port internally
+# -v if volumes need to be synced
+
+# more https://www.youtube.com/watch?v=3xDAU5cvi5E
