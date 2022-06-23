@@ -26,16 +26,22 @@ services:
       - /server/node_modules
     env_file:
       - ./server/.env
-  nginx:
-    depends_on:
-      - api
-      - client
-    restart: always
-    build:
-      dockerfile: Dockerfile
-      context: ./nginx
-    ports:
-      - "3050:80"
+  # nginx:
+  #   depends_on:
+  #     - api
+  #     - client
+  #   restart: always
+  #   build:
+  #     dockerfile: Dockerfile
+  #     context: ./nginx
+  #   ports:
+  #     - "3050:80"
+
+
+# TODO: Npm install does not work on client? needs manual install. Check maybe it is intalled in other location. Ideally, make production build instead.
+# also needs: npm install @tensorflow/tfjs
+#             npm i @mediapipe/pose
+# nginx allso breaks camera thing. But it is probably reasoanble, because of static...
 
 
 
