@@ -1,8 +1,9 @@
 FROM node
 WORKDIR /server
 COPY package.json /server/
-# Shouldint next two lines be swapped?
-COPY . /server/
 RUN npm install
+COPY . /server/
+# ENV PORT 3001
+# EXPOSE $PORT
 #CMD ["npm", "start"]
 CMD ["npm", "run", "dev"]
