@@ -18,7 +18,7 @@ export const useForm = (validate: any) => {
     event.preventDefault();
     setErrors(validate(values));
     // Your url for API
-    const url = '/api/form';
+    const url = 'http://localhost:3001/form';
     console.log(values)
     console.log(errors)
     if ((Object.keys(values).length === 4) && (Object.keys(errors).length === 0)) {
