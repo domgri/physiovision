@@ -6,7 +6,7 @@ services:
       context: ./client
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "3000:80"
     volumes:
       - ./client:/client
     # environment:
@@ -14,18 +14,18 @@ services:
     #   - CHOKIDAR_USEPOLLING=true
     env_file:
       - ./client/.env
-  api:
-    container_name: server
-    build:
-      context: ./server
-      dockerfile: Dockerfile
-    ports:
-      - "3001:3001"
-    volumes:
-      - ./server:/server
-      - /server/node_modules
-    env_file:
-      - ./server/.env
+  # api:
+  #   container_name: server
+  #   build:
+  #     context: ./server
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3001:3001"
+  #   volumes:
+  #     - ./server:/server
+  #     - /server/node_modules
+  #   env_file:
+  #     - ./server/.env
   # nginx:
   #   depends_on:
   #     - api

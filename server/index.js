@@ -38,8 +38,7 @@ app.use(bodyParser.json());
   
     
   const sgMail = require('@sendgrid/mail')
-  console.log(process.env.SENDGRID_API_KEY)
-  sgMail.setApiKey("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")
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
   const subject = "[" + req.body.emotion +"] Form response from physioloop.io"
 
