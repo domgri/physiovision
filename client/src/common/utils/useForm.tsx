@@ -18,7 +18,7 @@ export const useForm = (validate: any) => {
     event.preventDefault();
     setErrors(validate(values));
     // Your url for API
-    const url = 'https://demo.physioloop.io:3001/form';
+    const url = 'http://demo.physioloop.io:3001/form';
     console.log(values)
     console.log(errors)
     if ((Object.keys(values).length === 4) && (Object.keys(errors).length === 0)) {
