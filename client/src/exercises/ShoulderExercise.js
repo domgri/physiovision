@@ -506,11 +506,11 @@ function ShoulderExercise() {
         />
 
         <Row>
-          <Col xs={24} lg={12}>
+          {/* <Col xs={24} lg={12}>
           <Button  onClick={() => {navigator.mediaDevices.getUserMedia({video: true})}}>
             Grant camera permission
             </Button>
-          </Col>
+          </Col> */}
           <Col xs={24} lg={12}>
           <Button color="#fff"  onClick={() => {setGlobalState("finish"); setAppState("stop"); currentExerciseState = exerciseStates[2]; clearInterval(interval); }}>
             Finish early
