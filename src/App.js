@@ -434,8 +434,8 @@ function App() {
         <div class="basis-1/3 rounded border-solid border-2 border-sky-500">03</div>
       </div>
 
-      <div class="flex flex-row ">
-        <div class="relative-div grow"> 
+      <div class="flex flex-row  ">
+       <div class=' h-128  max-h-full rounded border-solid border-2 border-sky-500 grow'> aa</div>
         <Webcam 
               ref={webcamRef}
               mirrored
@@ -443,6 +443,7 @@ function App() {
                 position: "absolute",
                 marginLeft: "auto",
                 marginRight: "auto",
+                paddingTop: 20,
                 left: 0,
                 right: 0,
                 textAlign: "center",
@@ -458,6 +459,7 @@ function App() {
             position: "absolute",
             marginLeft: "auto",
             marginRight: "auto",
+            paddingTop: 20,
             left: 0,
             right: 0,
             textAlign: "center",
@@ -467,8 +469,6 @@ function App() {
           }}
         />
         
-
-        </div>
         
      
       </div>

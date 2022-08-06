@@ -19,3 +19,10 @@ code {
 relative-div {
   position: relative; 
 }
+
+temp-div-size {
+  position: "absolute";
+  width: 640px;
+  height: 480px;
+
+}
