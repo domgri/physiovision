@@ -29,13 +29,19 @@ import { Container } from 'postcss';
 // 4. repeat 5 times
 // 5. minotor that hands are still straight
 
+// 1. Elbows above ears, and wrists visible - stop video until position is reached
+// 2. elbow below shoulder, wrist further than shoulder - stop until done
+// 1. again
+// 3. - 2 but in other side
+
 
 
 function App() {
 
-  const [appState, setAppState] = useState("stop");
+  const [appState, setAppState] = useState("begin");
+  const [appInterval, setAppInterval] = useState();
 
-   const exerciseStates = ["setup", "run", "finish"]
+   const exerciseStates = ["HANDS_UP", "LEAN_RIGHT", "LEAN_LEFT"]
    const armStates = ["inside", "outside"]
 
   const webcamRef = useRef(null);
@@ -65,11 +71,11 @@ function App() {
 
     var detector = null;
 
-    
+    var currentExerciseState = "HANDS_UP";
+    var side = "left"
 
-    var currentExerciseState = "setup";
+
     var currentArmState = "inside";
-
 
     var count = 0
     var st = 0
@@ -175,9 +181,6 @@ function App() {
     }
 
 
-
-
-
     const setupDetector = async () => {
 
       //console.log("setupDetector A")
@@ -207,6 +210,11 @@ function App() {
         detect();
         
       }, 1000/FPS);
+
+      // clearInterval(interval)
+
+      // console.log(interval + " a")
+      // appInterval(interval)
 
         
     
@@ -242,10 +250,10 @@ function App() {
       //var endTime = performance.now()
         //console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
     
-      console.log(vWidth + " " + vHeight)
-      console.log(WIDTH+ " " + HEIGHT)
-      console.log(WIDTH * (vWidth / WIDTH)+ " " + HEIGHT * (vHeight / HEIGHT))
-      console.log("--")
+      // console.log(vWidth + " " + vHeight)
+      // console.log(WIDTH+ " " + HEIGHT)
+      // console.log(WIDTH * (vWidth / WIDTH)+ " " + HEIGHT * (vHeight / HEIGHT))
+      // console.log("--")
 
 
 
@@ -260,6 +268,41 @@ function App() {
 
     }
 
+    function areHandsUp(leftElbowY, leftEarY, rightElbowY, rightEarY) {
+        if ((leftElbowY < leftEarY) && (rightElbowY < rightEarY)) {
+          console.log(leftElbowY + " " + leftEarY)
+          console.log(rightElbowY + " " + rightEarY)
+          console.log("----")
+          // const sleep = ms => new Promise(r => setTimeout(r, ms));
+          // sleep(2000);
+          console.log("YES!!!!!!!!!!!!")
+          if (side === "left") {
+            currentExerciseState = "LEAN_LEFT"
+            side = "right"
+          } else {
+            currentExerciseState = "LEAN_RIGHT"
+            side = "left"
+          }
+          
+        }
+    }
+
+    function isLeanCorrect(shoulderX, shoulderY, elbowBelowY, wristX) {
+      if (side === "left") {
+        if ((shoulderX < wristX) && (shoulderY < elbowBelowY)) {
+          console.log ("GOOD LEAN left!!!")
+          currentExerciseState = "HANDS_UP"
+        }
+      } else {
+        if ((shoulderX > wristX) && (shoulderY < elbowBelowY)) {
+          console.log ("GOOD LEAN right!!!")
+          currentExerciseState = "HANDS_UP"
+        }
+      }
+      
+
+    }
+
 
     function drawCanvas (pose, video, videoWidth, videoHeight, canvas) {
       const ctx = canvas.current.getContext("2d");
@@ -270,75 +313,124 @@ function App() {
 
       
       //const [mirroredState, setMirroredState] = useState(true);
-      
-      
-      
-
-
-
-      
 
 
       switch(currentExerciseState) {
-        case "setup":
+        case "HANDS_UP":
 
-        // mirrored first
-        mirror(ctx, videoWidth)
+          // mirrored first
+          mirror(ctx, videoWidth)
 
-        // Exercise specific keypoints
-        //drawSpecific(pose[0]["keypoints"], 0.3, ctx)
-        drawPoint(ctx, pose[0]["keypoints"][9].y * 1, pose[0]["keypoints"][9].x * 1, 3, "aqua");
+          // Exercise specific keypoints
+          // right elbow
+          drawPoint(ctx, pose[0]["keypoints"][8].y * 1, pose[0]["keypoints"][8].x * 1, 3, "red");
+          //left elbow
+          drawPoint(ctx, pose[0]["keypoints"][7].y * 1, pose[0]["keypoints"][7].x * 1, 3, "aqua");
+          //right ear
+          drawPoint(ctx, pose[0]["keypoints"][4].y * 1, pose[0]["keypoints"][4].x * 1, 3, "orange");
+          //left ear
+          drawPoint(ctx, pose[0]["keypoints"][3].y * 1, pose[0]["keypoints"][3].x * 1, 3, "blue");
 
-        isReadyToStart(pose[0]["keypoints"][5], pose[0]["keypoints"][6], pose[0]["keypoints"][7], pose[0]["keypoints"][9], ctx)
+          areHandsUp(pose[0]["keypoints"][7].y, pose[0]["keypoints"][3].y, pose[0]["keypoints"][8].y, pose[0]["keypoints"][4].y)
 
-
-        // normal second
-        mirror(ctx, videoWidth)
-
-        drawText(50, 50, "Put left palm on your body where a circle is to begin", 24, colour1, SCALE, ctx)
-
-
-          
-          break;       
-        case "run":
-
-
-        // mirrored first (roughyl, some methods do that inside)
-        mirror(ctx, videoWidth)
-
-        // Check if arm is located aside body, warn if not
-        isArmAside(pose[0]["keypoints"][5], pose[0]["keypoints"][7], ctx, canvas, videoWidth)
+          break;
         
-        isWristAlgned(pose[0]["keypoints"][7], pose[0]["keypoints"][9], ctx, canvas, videoWidth)
+        case "LEAN_LEFT":
 
+          // mirrored first
+          mirror(ctx, videoWidth)
 
+          // Exercise specific keypoints
+          // left wrist
+          drawPoint(ctx, pose[0]["keypoints"][9].y * 1, pose[0]["keypoints"][9].x * 1, 3, "red");
 
+          //right elbow
+          drawPoint(ctx, pose[0]["keypoints"][8].y * 1, pose[0]["keypoints"][8].x * 1, 3, "aqua");
+          //right shoulder
+          drawPoint(ctx, pose[0]["keypoints"][6].y * 1, pose[0]["keypoints"][6].x * 1, 3, "blue");
 
-        // normal second
-        mirror(ctx, videoWidth)
-
-          if (currentArmState === armStates[0]) {
-            drawText(50, 50, "Move arm outside", 24, colour1, SCALE, ctx)
-
-          } else {
-            drawText(50, 50, "Move arm inside", 24, colour1, SCALE, ctx)
-          }
-          
-          drawRepetitions(ctx, canvas)
-
-          determineExerciseState(pose[0]["keypoints"][5].x, pose[0]["keypoints"][9].x)     
-          
-          //isShoulderStationary(pose[0]["keypoints"][5], pose[0]["keypoints"][6], ctx)
-          
+          isLeanCorrect(pose[0]["keypoints"][6].x, pose[0]["keypoints"][6].y, pose[0]["keypoints"][8].y, pose[0]["keypoints"][9].x)
           
           break;
-        case "finish":
-          drawText(50, 50, "Exercise finished", 24, colour1,  SCALE, ctx)
-          setAppState("stop")
-          currentExerciseState = exerciseStates[2]
-          clearInterval(interval)
 
-          break;
+        case "LEAN_RIGHT":
+
+          // mirrored first
+          mirror(ctx, videoWidth)
+
+          // Exercise specific keypoints
+          // right wrist
+          drawPoint(ctx, pose[0]["keypoints"][10].y * 1, pose[0]["keypoints"][10].x * 1, 3, "red");
+
+          //left elbow
+          drawPoint(ctx, pose[0]["keypoints"][7].y * 1, pose[0]["keypoints"][7].x * 1, 3, "aqua");
+          //left shoulder
+          drawPoint(ctx, pose[0]["keypoints"][5].y * 1, pose[0]["keypoints"][5].x * 1, 3, "blue");
+
+          isLeanCorrect(pose[0]["keypoints"][5].x, pose[0]["keypoints"][5].y, pose[0]["keypoints"][7].y, pose[0]["keypoints"][10].x)
+          
+          break;    
+
+
+
+
+        // // mirrored first
+        // mirror(ctx, videoWidth)
+
+        // // Exercise specific keypoints
+        // //drawSpecific(pose[0]["keypoints"], 0.3, ctx)
+        // drawPoint(ctx, pose[0]["keypoints"][9].y * 1, pose[0]["keypoints"][9].x * 1, 3, "aqua");
+
+        // isReadyToStart(pose[0]["keypoints"][5], pose[0]["keypoints"][6], pose[0]["keypoints"][7], pose[0]["keypoints"][9], ctx)
+
+
+        // // normal second
+        // mirror(ctx, videoWidth)
+
+        // drawText(50, 50, "Put left palm on your body where a circle is to begin", 24, colour1, SCALE, ctx)
+
+
+          
+        
+        // case "run":
+
+
+        // // mirrored first (roughyl, some methods do that inside)
+        // mirror(ctx, videoWidth)
+
+        // // Check if arm is located aside body, warn if not
+        // isArmAside(pose[0]["keypoints"][5], pose[0]["keypoints"][7], ctx, canvas, videoWidth)
+        
+        // isWristAlgned(pose[0]["keypoints"][7], pose[0]["keypoints"][9], ctx, canvas, videoWidth)
+
+
+
+
+        // // normal second
+        // mirror(ctx, videoWidth)
+
+        //   if (currentArmState === armStates[0]) {
+        //     drawText(50, 50, "Move arm outside", 24, colour1, SCALE, ctx)
+
+        //   } else {
+        //     drawText(50, 50, "Move arm inside", 24, colour1, SCALE, ctx)
+        //   }
+          
+        //   drawRepetitions(ctx, canvas)
+
+        //   determineExerciseState(pose[0]["keypoints"][5].x, pose[0]["keypoints"][9].x)     
+          
+        //   //isShoulderStationary(pose[0]["keypoints"][5], pose[0]["keypoints"][6], ctx)
+          
+          
+        //   break;
+        // case "finish":
+        //   drawText(50, 50, "Exercise finished", 24, colour1,  SCALE, ctx)
+        //   setAppState("stop")
+        //   currentExerciseState = exerciseStates[2]
+        //   clearInterval(interval)
+
+        //   break;
         default:
           console.log("exercise state error occured. Restart page.");
       } 
@@ -372,65 +464,52 @@ function App() {
     <div className="App">
       <header className="App-header">
 
-      {/* <div class="grid grid-cols-3 gap-4">
-      <div>01</div>
-      <div>02</div>
-      <div>03</div>
-      <div class="col-start-1 col-span-3">
 
-      <Webcam 
-              ref={webcamRef}
-              mirrored
-              style={{
-                position: "absolute",
-                marginLeft: "auto",
-                marginRight: "auto",
-                left: 0,
-                right: 0,
-                textAlign: "center",
-                zindex: 0,
-                width: 640,
-                height: 480,
-              }}
-            />
 
-        <canvas
-          ref={canvasRef}
-          style={{
-            position: "absolute",
-            marginLeft: "auto",
-            marginRight: "auto",
-            left: 0,
-            right: 0,
-            textAlign: "center",
-            zindex: 1,
-            width: 640,
-            height: 480,
-          }}
-        />
+      {/* <div style={{display : appState === 'begin' ? 'block' : 'none'}}>
+      <button onClick={() =>  setAppState("run")} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" >
+        Begin
+      </button>
+      </div>
+      <div style={{display : appState === 'run' ? 'block' : 'none'}}>
+      <button onClick={() =>  {setAppState("stop"); console.log("interval= " + interval); clearInterval(interval)}} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" >
+        Early stop
+      </button>
+      </div>
+      <div style={{display : appState === 'stop' ? 'block' : 'none'}}>
+      <button onClick={() =>  {setAppState("run"); clearInterval(interval)}} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" >
+        Continue
+      </button>
+      </div> */}
+
+{/*  
+      <div style={{display : appState === 'begin' ? 'block' : 'none'}}>
+
       </div>
 
-      <div>04</div>
-      <div>05</div>      
-      <div>06</div>
-        </div> */}
+      <div style={{display : appState === 'begin' ? 'block' : 'none'}}>
+
+      </div> */}
 
       <div class="flex flex-col space-y-4 ...">
 
       <div class="flex flex-row space-x-4">
         <div class="basis-1/3 rounded border-solid border-2 border-sky-500">
-
+        {currentExerciseState }
+{/*        
+        <button  onClick={() => {setAppState("run")}}>
+        (Re)Start
+        </button> */}
        
+
+        </div>
+        <div class="basis-1/3 rounded border-solid border-2 border-sky-500">
+
+                 
         <button  onClick={() => {setAppState("run")}}>
         (Re)Start
         </button>
-       
-
-
-
-
         </div>
-        <div class="basis-1/3 rounded border-solid border-2 border-sky-500">02</div>
         <div class="basis-1/3 rounded border-solid border-2 border-sky-500">03</div>
       </div>
 
@@ -480,7 +559,7 @@ function App() {
         <div class="basis-1/3">03</div>
       </div>
 
-      </div>
+      </div> 
       
       
 
