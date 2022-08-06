@@ -549,9 +549,11 @@ function App() {
 
       <div class="flex flex-col space-y-4 ...">
 
-      <div class="flex flex-row space-x-4">
-        <div class="basis-1/3 rounded border-solid border-2 border-sky-500">
-        {currentExerciseState }
+
+      <div class="flex flex-row space-x-4 my-5">
+        <div class="basis-1/3 rounded border-solid text-xl">
+          physioloop.io
+        
 {/*        
         <button  onClick={() => {setAppState("run")}}>
         (Re)Start
@@ -559,18 +561,18 @@ function App() {
        
 
         </div>
-        <div class="basis-1/3 rounded border-solid border-2 border-sky-500">
+        <div class="basis-1/3 rounded border-solid border-2 border-blue-600 hover:bg-sky-700 text-2xl ">
 
                  
         <button  onClick={() => {setAppState("run")}}>
-        (Re)Start
+        Begin
         </button>
         </div>
-        <div class="basis-1/3 rounded border-solid border-2 border-sky-500">03</div>
+        <div class="basis-1/3 rounded border-solid "> </div>
       </div>
 
       <div class="flex flex-row  ">
-       <div class=' h-128  max-h-full rounded border-solid border-2 border-sky-500 grow'> 
+       <div class=' h-128  max-h-full rounded border-solid border-2 border-blue-600 grow'> 
        
        <div className="video">
 
@@ -638,9 +640,9 @@ function App() {
       
 
       <div class="flex flex-row">
-        <div class="basis-1/3">01</div>
-        <div class="basis-1/3">02</div>
-        <div class="basis-1/3">03</div>
+        <div class="basis-1/3"></div>
+        <div class="basis-1/3"></div>
+        <div class="basis-1/3">Exercise credits: <a href="https://www.youtube.com/c/YogawithUliana">Yoga with Uliana </a></div>
       </div>
 
       </div> 
