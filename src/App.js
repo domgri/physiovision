@@ -19,38 +19,19 @@ import FPSStats from "react-fps-stats"
 import {Helmet} from "react-helmet";
 
 import MediaQuery from 'react-responsive'
+import { Container } from 'postcss';
 
 
+// Todo:
+// 1. Start with fitting in a screen with hands up (2 sec?) alligned (check by wrist positions)
+// 2. start exercise by leaning to one side (5 sec)
+// 3. then lean to another side
+// 4. repeat 5 times
+// 5. minotor that hands are still straight
 
-  // // Get display size
-    
-  // function getWindowDimensions() {
-  //   const { innerWidth: width, innerHeight: height } = window;
-  //   return {
-  //     width,
-  //     height
-  //   };
-  // }
-  
-  //  function useWindowDimensions() {
-  //   const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
-  
-  //   useEffect(() => {
-  //     function handleResize() {
-  //       setWindowDimensions(getWindowDimensions());
-  //     }
-  
-  //     window.addEventListener('resize', handleResize);
-  //     return () => window.removeEventListener('resize', handleResize);
-  //   }, []);
-  
-  //   return windowDimensions;
-  // }
 
 
 function App() {
-  
-  
 
   const [appState, setAppState] = useState("stop");
 
@@ -390,17 +371,127 @@ function App() {
     
     <div className="App">
       <header className="App-header">
-      {/* <MetaTags>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
-      </MetaTags> */}
+
+      {/* <div class="grid grid-cols-3 gap-4">
+      <div>01</div>
+      <div>02</div>
+      <div>03</div>
+      <div class="col-start-1 col-span-3">
+
+      <Webcam 
+              ref={webcamRef}
+              mirrored
+              style={{
+                position: "absolute",
+                marginLeft: "auto",
+                marginRight: "auto",
+                left: 0,
+                right: 0,
+                textAlign: "center",
+                zindex: 0,
+                width: 640,
+                height: 480,
+              }}
+            />
+
+        <canvas
+          ref={canvasRef}
+          style={{
+            position: "absolute",
+            marginLeft: "auto",
+            marginRight: "auto",
+            left: 0,
+            right: 0,
+            textAlign: "center",
+            zindex: 1,
+            width: 640,
+            height: 480,
+          }}
+        />
+      </div>
+
+      <div>04</div>
+      <div>05</div>      
+      <div>06</div>
+        </div> */}
+
+      <div class="flex flex-col space-y-4 ...">
+
+      <div class="flex flex-row space-x-4">
+        <div class="basis-1/3 rounded border-solid border-2 border-sky-500">
+
+       
+        <button  onClick={() => {setAppState("run")}}>
+        (Re)Start
+        </button>
+       
 
 
-      {/* THrows error!!!!! */}
-      <Helmet>
+
+
+        </div>
+        <div class="basis-1/3 rounded border-solid border-2 border-sky-500">02</div>
+        <div class="basis-1/3 rounded border-solid border-2 border-sky-500">03</div>
+      </div>
+
+      <div class="flex flex-row ">
+        <div class="relative-div grow"> 
+        <Webcam 
+              ref={webcamRef}
+              mirrored
+              style={{
+                position: "absolute",
+                marginLeft: "auto",
+                marginRight: "auto",
+                left: 0,
+                right: 0,
+                textAlign: "center",
+                zindex: 9,
+                width: 640,
+                height: 480,
+              }}
+            />
+
+        <canvas
+          ref={canvasRef}
+          style={{
+            position: "absolute",
+            marginLeft: "auto",
+            marginRight: "auto",
+            left: 0,
+            right: 0,
+            textAlign: "center",
+            zindex: 9,
+            width: 640,
+            height: 480,
+          }}
+        />
+        
+
+        </div>
+        
+     
+      </div>
+      
+
+      <div class="flex flex-row">
+        <div class="basis-1/3">01</div>
+        <div class="basis-1/3">02</div>
+        <div class="basis-1/3">03</div>
+      </div>
+
+      </div>
+      
+      
+
+      {/* <Helmet>
           <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
-          <title>Prototype exercise 1.0.2</title>
-          {/* <link rel="canonical" href="http://mysite.com/example" /> */}
+          <title>Physioloop.io strech exercise</title>
       </Helmet>
+      <h1 className="text-3xl font-bold underline">
+      Hello world!
+    </h1>
+      <div> state: {currentExerciseState }</div>
 
       <MediaQuery minWidth={1224}>
         <Webcam
@@ -485,16 +576,7 @@ function App() {
 
       </MediaQuery>
 
-        
-
-      
-
-      {/* <button onClick={() => {setAppState("stop"); setExerciseState(exerciseStates[2]); clearInterval(interval)}}>
-      Stop
-      </button> */}
-      <FPSStats />
-
-
+      <FPSStats /> */}
 
       </header>
     </div>
