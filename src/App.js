@@ -21,6 +21,8 @@ import {Helmet} from "react-helmet";
 import MediaQuery from 'react-responsive'
 import { Container } from 'postcss';
 
+import exerciseSource from "./videos/exercise.mp4";
+
 
 // Todo:
 // 1. Start with fitting in a screen with hands up (2 sec?) alligned (check by wrist positions)
@@ -65,6 +67,8 @@ function App() {
 
   if (appState == "run") {
 
+    
+
     //console.log(appState + " run")
 
     const detectorConfig = {modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER};
@@ -73,6 +77,7 @@ function App() {
 
     var currentExerciseState = "HANDS_UP";
     var side = "left"
+    var positionCounter = 0
 
 
     var currentArmState = "inside";
@@ -92,11 +97,32 @@ function App() {
 
     var interval = null;
 
+    var points = [0,4,11,15,21,26,31,35,42],
+    index = 1,
+    currentStopTime = points[index];
+
+    var video = document.getElementById("exerciseVideo"); 
+    video.play();
+
 
 
 
 
     // functions
+
+    function checkTime() {
+      console.log("positionCounter: " + positionCounter)
+      console.log("index: " + index)
+      if ((video.currentTime >= currentStopTime) && (positionCounter < index)) {
+          video.pause();
+          if (points.length > ++index) {       // increase index and get next time
+              currentStopTime = points[index]
+          }
+          else {                               // or loop/next...
+              // done
+          }
+      }
+  }
 
     function determineExerciseState(leftShoulderX, leftWristX) {
 
@@ -189,6 +215,15 @@ function App() {
       //console.log("setupDetector B")
     
     }
+
+    function startInterval () {
+      interval = setInterval(() => {
+        console.log("interval")
+
+        detect();
+        
+      }, 1000/FPS);
+    }
     
     function runDetection() {
 
@@ -204,12 +239,10 @@ function App() {
       //   return
       // }
 
-      interval = setInterval(() => {
-        console.log("interval")
+      
 
-        detect();
-        
-      }, 1000/FPS);
+      startInterval()
+      
 
       // clearInterval(interval)
 
@@ -268,6 +301,14 @@ function App() {
 
     }
 
+    function timeout(time) {
+      clearInterval(interval)
+          setTimeout(() => {
+            startInterval()
+          }, 1000)
+
+    }
+
     function areHandsUp(leftElbowY, leftEarY, rightElbowY, rightEarY) {
         if ((leftElbowY < leftEarY) && (rightElbowY < rightEarY)) {
           console.log(leftElbowY + " " + leftEarY)
@@ -276,6 +317,7 @@ function App() {
           // const sleep = ms => new Promise(r => setTimeout(r, ms));
           // sleep(2000);
           console.log("YES!!!!!!!!!!!!")
+          
           if (side === "left") {
             currentExerciseState = "LEAN_LEFT"
             side = "right"
@@ -283,6 +325,12 @@ function App() {
             currentExerciseState = "LEAN_RIGHT"
             side = "left"
           }
+
+          timeout(2000)
+          video.play();
+          positionCounter++;
+
+          
           
         }
     }
@@ -292,13 +340,21 @@ function App() {
         if ((shoulderX < wristX) && (shoulderY < elbowBelowY)) {
           console.log ("GOOD LEAN left!!!")
           currentExerciseState = "HANDS_UP"
+          timeout(2000)
+          video.play();
+          positionCounter++;
         }
       } else {
         if ((shoulderX > wristX) && (shoulderY < elbowBelowY)) {
           console.log ("GOOD LEAN right!!!")
           currentExerciseState = "HANDS_UP"
+          timeout(2000)
+          video.play();
+          positionCounter++;
         }
       }
+
+      
       
 
     }
@@ -314,7 +370,7 @@ function App() {
       
       //const [mirroredState, setMirroredState] = useState(true);
 
-
+      checkTime()
       switch(currentExerciseState) {
         case "HANDS_UP":
 
@@ -514,8 +570,29 @@ function App() {
       </div>
 
       <div class="flex flex-row  ">
-       <div class=' h-128  max-h-full rounded border-solid border-2 border-sky-500 grow'> aa</div>
-        <Webcam 
+       <div class=' h-128  max-h-full rounded border-solid border-2 border-sky-500 grow'> 
+       
+       <div className="video">
+
+        <video id="exerciseVideo" width="640" height="480" autoPlay="autoplay" style={{
+          position: "absolute",
+          marginLeft: "auto",
+          marginRight: "auto",
+          paddingTop: 20,
+          left: 0,
+          right: 0,
+          // "z-index": 1,
+        }}>
+
+<source src={exerciseSource} type="video/mp4" />
+      </video>
+
+       </div>
+       
+       </div>
+       <div className = "webcam">
+
+       <Webcam 
               ref={webcamRef}
               mirrored
               style={{
@@ -526,12 +603,15 @@ function App() {
                 left: 0,
                 right: 0,
                 textAlign: "center",
-                zindex: 9,
+                // zindex: 0,
                 width: 640,
                 height: 480,
               }}
-            />
+            /> 
 
+       </div>
+        
+        <div className="canvas">
         <canvas
           ref={canvasRef}
           style={{
@@ -542,11 +622,15 @@ function App() {
             left: 0,
             right: 0,
             textAlign: "center",
-            zindex: 9,
+            // "z-index": 2,
             width: 640,
             height: 480,
           }}
         />
+
+        </div>
+
+       
         
         
      

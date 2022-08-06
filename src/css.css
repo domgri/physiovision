@@ -3,3 +3,18 @@
     justify-content: flex-end;
     margin-top: -500px;
   }
+
+  .webcam {
+    position: "absolute";
+    marginLeft: "auto";
+    marginRight: "auto";
+    paddingTop: 20;
+    left: 0;
+    right: 0;
+    textAlign: "center";
+    z-index: 0;
+    width: 640;
+    height: 480;
+  
+  }
+  
