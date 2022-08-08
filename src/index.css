@@ -27,12 +27,9 @@ temp-div-size {
 
 }
 
-webcam {
-  z-index: 1;
-}
 
 video {
-  z-index: 2;
+  z-index: 1;
 }
 
 canvas {

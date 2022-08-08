@@ -7,3 +7,11 @@
   .webcam {
     z-index: 1;
   }
+
+  .video {
+    z-index: 2;
+  }
+  
+  .canvas {
+    z-index: 3;
+  } 

@@ -571,13 +571,13 @@ function App() {
         <div class="basis-1/3 rounded border-solid "> </div>
       </div>
 
-      <div class="flex flex-row  ">
-       <div class=' h-128  max-h-full rounded border-solid border-2 border-blue-600 grow'> 
+      <div class="flex flex-row  flex-wrap rounded border-solid border-2 border-blue-600">
+       <div class=' h-128  max-h-full  grow'> 
        
        <div className="video">
 
         <video id="exerciseVideo" width="640" height="480" autoPlay="autoplay" style={{
-          position: "absolute",
+          position: "relative",
           marginLeft: "auto",
           marginRight: "auto",
           paddingTop: 20,
@@ -592,13 +592,15 @@ function App() {
        </div>
        
        </div>
+
+
        <div className = "webcam">
 
        <Webcam 
               ref={webcamRef}
               mirrored
               style={{
-                position: "absolute",
+                position: "relative",
                 marginLeft: "auto",
                 marginRight: "auto",
                 paddingTop: 20,
@@ -618,7 +620,7 @@ function App() {
           ref={canvasRef}
           style={{
             position: "absolute",
-            marginLeft: "auto",
+            marginLeft: "860px",
             marginRight: "auto",
             paddingTop: 20,
             left: 0,
