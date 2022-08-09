@@ -61,6 +61,9 @@ function App() {
   const HEIGHT = 480
 
   const [size, setSize] = useState([0, 0]);
+
+  const [seconds, setSeconds] = useState(0)
+  const [isCorrectPose, setIsCorrectPose] = useState("no")
   
 
   //console.log(appState)
@@ -104,17 +107,56 @@ function App() {
     var video = document.getElementById("exerciseVideo"); 
     video.play();
 
+    var token;
+    var sec = 0
+
+    var setTimerIsSet = false
 
 
+    async function setTimer() {
 
+      console.log("setTimer!")
+
+      if (sec > 0) {
+        return
+      }
+      
+      console.log("setTimer2")
+      sec = 5
+      setSeconds(sec)
+      token = await setInterval(updateTimer, 1000)
+      console.log("setTimer!3")
+    }
 
     // functions
 
+    function updateTimer() {
+      sec -= 1
+      setSeconds(seconds => sec)
+
+      if (sec===0) {
+        clearInterval(token)
+      }
+    }
+
+    function once(fn, context) { 
+      var result;
+      return function() { 
+          if (fn) {
+              result = fn.apply(context || this, arguments);
+              fn = null;
+          }
+          return result;
+      };
+  }
+
+
     function checkTime() {
-      console.log("positionCounter: " + positionCounter)
-      console.log("index: " + index)
+      // console.log("positionCounter: " + positionCounter)
+      // console.log("index: " + index)
       if ((video.currentTime >= currentStopTime) && (positionCounter < index)) {
           video.pause();
+          
           if (points.length > ++index) {       // increase index and get next time
               currentStopTime = points[index]
           }
@@ -218,7 +260,7 @@ function App() {
 
     function startInterval () {
       interval = setInterval(() => {
-        console.log("interval")
+        //console.log("interval")
 
         detect();
         
@@ -325,8 +367,19 @@ function App() {
             currentExerciseState = "LEAN_RIGHT"
             side = "left"
           }
-
-          timeout(2000)
+          
+          
+          // setIsCorrectPose("yess")
+          // setTimeout(() => {
+          //   setIsCorrectPose("no");
+          // }, 1000);
+            //setTimer()
+            // if (!setTimerIsSet) {
+            //   once(setTimer())
+            //   setTimerIsSet = true
+            // }
+              
+          
           video.play();
           positionCounter++;
 
@@ -340,7 +393,9 @@ function App() {
         if ((shoulderX < wristX) && (shoulderY < elbowBelowY)) {
           console.log ("GOOD LEAN left!!!")
           currentExerciseState = "HANDS_UP"
-          timeout(2000)
+          //setTimer()
+
+          
           video.play();
           positionCounter++;
         }
@@ -348,7 +403,7 @@ function App() {
         if ((shoulderX > wristX) && (shoulderY < elbowBelowY)) {
           console.log ("GOOD LEAN right!!!")
           currentExerciseState = "HANDS_UP"
-          timeout(2000)
+          //setTimer()
           video.play();
           positionCounter++;
         }
@@ -371,6 +426,7 @@ function App() {
       //const [mirroredState, setMirroredState] = useState(true);
 
       checkTime()
+      //console.log("seconds = " + seconds)
       switch(currentExerciseState) {
         case "HANDS_UP":
 
@@ -379,15 +435,18 @@ function App() {
 
           // Exercise specific keypoints
           // right elbow
-          drawPoint(ctx, pose[0]["keypoints"][8].y * 1, pose[0]["keypoints"][8].x * 1, 3, "red");
+          //drawPoint(ctx, pose[0]["keypoints"][8].y * 1, pose[0]["keypoints"][8].x * 1, 3, "red");
           //left elbow
-          drawPoint(ctx, pose[0]["keypoints"][7].y * 1, pose[0]["keypoints"][7].x * 1, 3, "aqua");
+         // drawPoint(ctx, pose[0]["keypoints"][7].y * 1, pose[0]["keypoints"][7].x * 1, 3, "aqua");
           //right ear
-          drawPoint(ctx, pose[0]["keypoints"][4].y * 1, pose[0]["keypoints"][4].x * 1, 3, "orange");
+          //drawPoint(ctx, pose[0]["keypoints"][4].y * 1, pose[0]["keypoints"][4].x * 1, 3, "orange");
           //left ear
-          drawPoint(ctx, pose[0]["keypoints"][3].y * 1, pose[0]["keypoints"][3].x * 1, 3, "blue");
+         //drawPoint(ctx, pose[0]["keypoints"][3].y * 1, pose[0]["keypoints"][3].x * 1, 3, "blue");
 
-          areHandsUp(pose[0]["keypoints"][7].y, pose[0]["keypoints"][3].y, pose[0]["keypoints"][8].y, pose[0]["keypoints"][4].y)
+       
+            areHandsUp(pose[0]["keypoints"][7].y, pose[0]["keypoints"][3].y, pose[0]["keypoints"][8].y, pose[0]["keypoints"][4].y)
+          
+          
 
           break;
         
@@ -398,14 +457,17 @@ function App() {
 
           // Exercise specific keypoints
           // left wrist
-          drawPoint(ctx, pose[0]["keypoints"][9].y * 1, pose[0]["keypoints"][9].x * 1, 3, "red");
+          //drawPoint(ctx, pose[0]["keypoints"][9].y * 1, pose[0]["keypoints"][9].x * 1, 3, "red");
 
           //right elbow
-          drawPoint(ctx, pose[0]["keypoints"][8].y * 1, pose[0]["keypoints"][8].x * 1, 3, "aqua");
+          //drawPoint(ctx, pose[0]["keypoints"][8].y * 1, pose[0]["keypoints"][8].x * 1, 3, "aqua");
           //right shoulder
-          drawPoint(ctx, pose[0]["keypoints"][6].y * 1, pose[0]["keypoints"][6].x * 1, 3, "blue");
+          //drawPoint(ctx, pose[0]["keypoints"][6].y * 1, pose[0]["keypoints"][6].x * 1, 3, "blue");
+          
+    
+            isLeanCorrect(pose[0]["keypoints"][6].x, pose[0]["keypoints"][6].y, pose[0]["keypoints"][8].y, pose[0]["keypoints"][9].x)
 
-          isLeanCorrect(pose[0]["keypoints"][6].x, pose[0]["keypoints"][6].y, pose[0]["keypoints"][8].y, pose[0]["keypoints"][9].x)
+         
           
           break;
 
@@ -416,14 +478,17 @@ function App() {
 
           // Exercise specific keypoints
           // right wrist
-          drawPoint(ctx, pose[0]["keypoints"][10].y * 1, pose[0]["keypoints"][10].x * 1, 3, "red");
+          //drawPoint(ctx, pose[0]["keypoints"][10].y * 1, pose[0]["keypoints"][10].x * 1, 3, "red");
 
           //left elbow
-          drawPoint(ctx, pose[0]["keypoints"][7].y * 1, pose[0]["keypoints"][7].x * 1, 3, "aqua");
+          //drawPoint(ctx, pose[0]["keypoints"][7].y * 1, pose[0]["keypoints"][7].x * 1, 3, "aqua");
           //left shoulder
-          drawPoint(ctx, pose[0]["keypoints"][5].y * 1, pose[0]["keypoints"][5].x * 1, 3, "blue");
+          //drawPoint(ctx, pose[0]["keypoints"][5].y * 1, pose[0]["keypoints"][5].x * 1, 3, "blue");
 
-          isLeanCorrect(pose[0]["keypoints"][5].x, pose[0]["keypoints"][5].y, pose[0]["keypoints"][7].y, pose[0]["keypoints"][10].x)
+ 
+            isLeanCorrect(pose[0]["keypoints"][5].x, pose[0]["keypoints"][5].y, pose[0]["keypoints"][7].y, pose[0]["keypoints"][10].x)
+ 
+         
           
           break;    
 
@@ -569,6 +634,7 @@ function App() {
         </button>
         </div>
         <div class="basis-1/3 rounded border-solid "> </div>
+      
       </div>
 
       <div class="flex flex-row  flex-wrap rounded border-solid border-2 border-blue-600">
