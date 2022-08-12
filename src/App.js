@@ -23,6 +23,8 @@ import { Container } from 'postcss';
 
 import exerciseSource from "./videos/exercise.mp4";
 
+//?
+
 
 // Todo:
 // 1. Start with fitting in a screen with hands up (2 sec?) alligned (check by wrist positions)
@@ -112,7 +114,7 @@ function App() {
 
     var setTimerIsSet = false
 
-    const ALLOWED_ELBOW_BEND_ANGLE = 50
+    const ALLOWED_ELBOW_BEND_ANGLE = 40
 
 
     async function setTimer() {
