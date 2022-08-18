@@ -2,7 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import './css.css';
 
-import React, { useRef, useState, useEffect, useLayoutEffect} from "react";
+import React, { useRef, useState, useEffect, useLayoutEffect } from "react";
 import * as poseDetection from '@tensorflow-models/pose-detection';
 import * as tf from '@tensorflow/tfjs-core';
 // Register one of the TF.js backends.
@@ -16,7 +16,7 @@ import FPSStats from "react-fps-stats"
 
 //import MetaTags from 'react-meta-tags';
 
-import {Helmet} from "react-helmet";
+import { Helmet } from "react-helmet";
 
 import MediaQuery from 'react-responsive'
 import { Container } from 'postcss';
@@ -43,16 +43,16 @@ function App() {
   const [appState, setAppState] = useState("begin");
   const [appInterval, setAppInterval] = useState();
 
-   const exerciseStates = ["HANDS_UP", "LEAN_RIGHT", "LEAN_LEFT"]
-   const armStates = ["inside", "outside"]
+  const exerciseStates = ["HANDS_UP", "LEAN_RIGHT", "LEAN_LEFT"]
+  const armStates = ["inside", "outside"]
 
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
 
   var list = []
 
-    var vWidth = window.innerWidth;
-    var vHeight = window.innerHeight;
+  var vWidth = window.innerWidth;
+  var vHeight = window.innerHeight;
 
   //const {vWidth, vHeight} = useWindowDimensions();
   console.log(vWidth)
@@ -61,17 +61,17 @@ function App() {
   const HEIGHT = 480
 
   const [size, setSize] = useState([0, 0]);
-  
+
 
   //console.log(appState)
 
   if (appState == "run") {
 
-    
+
 
     //console.log(appState + " run")
 
-    const detectorConfig = {modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER};
+    const detectorConfig = { modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER };
 
     var detector = null;
 
@@ -97,11 +97,11 @@ function App() {
 
     var interval = null;
 
-    var points = [0,4,11,15,21,26,31,35,42],
-    index = 1,
-    currentStopTime = points[index];
+    var points = [0, 4, 11, 15, 21, 26, 31, 35, 42],
+      index = 1,
+      currentStopTime = points[index];
 
-    var video = document.getElementById("exerciseVideo"); 
+    var video = document.getElementById("video");
     video.play();
 
 
@@ -114,24 +114,24 @@ function App() {
       console.log("positionCounter: " + positionCounter)
       console.log("index: " + index)
       if ((video.currentTime >= currentStopTime) && (positionCounter < index)) {
-          video.pause();
-          if (points.length > ++index) {       // increase index and get next time
-              currentStopTime = points[index]
-          }
-          else {                               // or loop/next...
-              // done
-          }
+        video.pause();
+        if (points.length > ++index) {       // increase index and get next time
+          currentStopTime = points[index]
+        }
+        else {                               // or loop/next...
+          // done
+        }
       }
-  }
+    }
 
     function determineExerciseState(leftShoulderX, leftWristX) {
 
       if (((leftWristX) > leftShoulderX) && (currentArmState != "outside")) {
         currentArmState = "outside";
 
-        
+
       }
-      else if ((leftWristX < leftShoulderX)  && (currentArmState != "inside")) {
+      else if ((leftWristX < leftShoulderX) && (currentArmState != "inside")) {
         currentArmState = "inside";
 
         count += 1;
@@ -141,23 +141,23 @@ function App() {
       if (count >= REPETITIONS) {
         currentExerciseState = exerciseStates[2]
       }
-      
+
     }
 
-    function drawRepetitions(ctx, canvas){
+    function drawRepetitions(ctx, canvas) {
 
-      drawText(canvas.current.width - 50, 50, count +"/"+ REPETITIONS, 24, colour1, SCALE, ctx)
+      drawText(canvas.current.width - 50, 50, count + "/" + REPETITIONS, 24, colour1, SCALE, ctx)
 
     }
 
     const isArmAside = async (leftShoulder, leftElbow, ctx, canvas, videoWidth) => {
-    
+
       if (Math.abs(leftShoulder.x - leftElbow.x) > PX_THRESHOLD * 5) {
 
-        drawSegment([leftShoulder.y, leftShoulder.x], [leftElbow.y, leftElbow.x], colour2, SCALE, ctx )
+        drawSegment([leftShoulder.y, leftShoulder.x], [leftElbow.y, leftElbow.x], colour2, SCALE, ctx)
 
         mirror(ctx, videoWidth)
-        
+
         drawText(50, 100, "Make sure your arm is aside", 24, colour2, SCALE, ctx)
 
         mirror(ctx, videoWidth)
@@ -168,10 +168,10 @@ function App() {
 
 
     const isWristAlgned = async (leftElbow, leftWrist, ctx, canvas, videoWidth) => {
-      
+
       if (Math.abs(leftElbow.y - leftWrist.y) > PX_THRESHOLD * 5) {
 
-        drawSegment([leftElbow.y, leftElbow.x - 100], [leftElbow.y, leftElbow.x + 100], colour2, SCALE, ctx )
+        drawSegment([leftElbow.y, leftElbow.x - 100], [leftElbow.y, leftElbow.x + 100], colour2, SCALE, ctx)
 
         mirror(ctx, videoWidth)
 
@@ -182,17 +182,17 @@ function App() {
       }
     }
 
-    function isReadyToStart(leftShoulder, rightShoulder, leftElbow, leftWrist,  ctx) {
+    function isReadyToStart(leftShoulder, rightShoulder, leftElbow, leftWrist, ctx) {
 
       //console.log("sh: "+ Math.abs((rightShoulder.x - leftShoulder.x)) )
       //console.log(leftWrist.x)
       //console.log("r: " + (Math.abs((rightShoulder.x - leftShoulder.x)) - leftWrist.x))
       // Wrist is around the middle of a chest
 
-      const positionX = Math.abs((rightShoulder.x - leftShoulder.x)/2 + leftShoulder.x)
+      const positionX = Math.abs((rightShoulder.x - leftShoulder.x) / 2 + leftShoulder.x)
       const positionY = leftElbow.y
       drawCircle(positionX, positionY, PX_THRESHOLD, ctx)
-      
+
       if (((Math.abs(leftWrist.x - positionX) < PX_THRESHOLD * 5) && (positionX > 0))
         && (Math.abs(leftWrist.y - positionY) < PX_THRESHOLD * 5) && (positionY > 0)) {
 
@@ -213,18 +213,18 @@ function App() {
 
       detector = await poseDetection.createDetector(poseDetection.SupportedModels.MoveNet, detectorConfig);
       //console.log("setupDetector B")
-    
+
     }
 
-    function startInterval () {
+    function startInterval() {
       interval = setInterval(() => {
         console.log("interval")
 
         detect();
-        
-      }, 1000/FPS);
+
+      }, 1000 / FPS);
     }
-    
+
     function runDetection() {
 
       //console.log("runDetection A")
@@ -239,18 +239,18 @@ function App() {
       //   return
       // }
 
-      
+
 
       startInterval()
-      
+
 
       // clearInterval(interval)
 
       // console.log(interval + " a")
       // appInterval(interval)
 
-        
-    
+
+
 
       //clearInterval(interval)
     }
@@ -277,68 +277,68 @@ function App() {
         // Set video width
         webcamRef.current.video.width = videoWidth;
         webcamRef.current.video.height = videoHeight;
-    
+
         //var startTime = performance.now()
-      const poses = await detector.estimatePoses(video);
-      //var endTime = performance.now()
+        const poses = await detector.estimatePoses(video);
+        //var endTime = performance.now()
         //console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
-    
-      // console.log(vWidth + " " + vHeight)
-      // console.log(WIDTH+ " " + HEIGHT)
-      // console.log(WIDTH * (vWidth / WIDTH)+ " " + HEIGHT * (vHeight / HEIGHT))
-      // console.log("--")
+
+        // console.log(vWidth + " " + vHeight)
+        // console.log(WIDTH+ " " + HEIGHT)
+        // console.log(WIDTH * (vWidth / WIDTH)+ " " + HEIGHT * (vHeight / HEIGHT))
+        // console.log("--")
 
 
 
-      drawCanvas(poses, video, videoWidth, videoHeight, canvasRef);
+        drawCanvas(poses, video, videoWidth, videoHeight, canvasRef);
 
       }
     }
 
     function mirror(ctx, videoWidth) {
-        ctx.translate(videoWidth, 0);
-        ctx.scale(-1, 1);
+      ctx.translate(videoWidth, 0);
+      ctx.scale(-1, 1);
 
     }
 
     function timeout(time) {
       clearInterval(interval)
-          setTimeout(() => {
-            startInterval()
-          }, 1000)
+      setTimeout(() => {
+        startInterval()
+      }, 1000)
 
     }
 
     function areHandsUp(leftElbowY, leftEarY, rightElbowY, rightEarY) {
-        if ((leftElbowY < leftEarY) && (rightElbowY < rightEarY)) {
-          console.log(leftElbowY + " " + leftEarY)
-          console.log(rightElbowY + " " + rightEarY)
-          console.log("----")
-          // const sleep = ms => new Promise(r => setTimeout(r, ms));
-          // sleep(2000);
-          console.log("YES!!!!!!!!!!!!")
-          
-          if (side === "left") {
-            currentExerciseState = "LEAN_LEFT"
-            side = "right"
-          } else {
-            currentExerciseState = "LEAN_RIGHT"
-            side = "left"
-          }
+      if ((leftElbowY < leftEarY) && (rightElbowY < rightEarY)) {
+        console.log(leftElbowY + " " + leftEarY)
+        console.log(rightElbowY + " " + rightEarY)
+        console.log("----")
+        // const sleep = ms => new Promise(r => setTimeout(r, ms));
+        // sleep(2000);
+        console.log("YES!!!!!!!!!!!!")
 
-          timeout(2000)
-          video.play();
-          positionCounter++;
-
-          
-          
+        if (side === "left") {
+          currentExerciseState = "LEAN_LEFT"
+          side = "right"
+        } else {
+          currentExerciseState = "LEAN_RIGHT"
+          side = "left"
         }
+
+        timeout(2000)
+        video.play();
+        positionCounter++;
+
+
+
+      }
     }
 
     function isLeanCorrect(shoulderX, shoulderY, elbowBelowY, wristX) {
       if (side === "left") {
         if ((shoulderX < wristX) && (shoulderY < elbowBelowY)) {
-          console.log ("GOOD LEAN left!!!")
+          console.log("GOOD LEAN left!!!")
           currentExerciseState = "HANDS_UP"
           timeout(2000)
           video.play();
@@ -346,7 +346,7 @@ function App() {
         }
       } else {
         if ((shoulderX > wristX) && (shoulderY < elbowBelowY)) {
-          console.log ("GOOD LEAN right!!!")
+          console.log("GOOD LEAN right!!!")
           currentExerciseState = "HANDS_UP"
           timeout(2000)
           video.play();
@@ -354,24 +354,24 @@ function App() {
         }
       }
 
-      
-      
+
+
 
     }
 
 
-    function drawCanvas (pose, video, videoWidth, videoHeight, canvas) {
+    function drawCanvas(pose, video, videoWidth, videoHeight, canvas) {
       const ctx = canvas.current.getContext("2d");
       //const ctxEx = canvas.current.getContext("2d");
       canvas.current.width = videoWidth;
       canvas.current.height = videoHeight;
 
 
-      
+
       //const [mirroredState, setMirroredState] = useState(true);
 
       checkTime()
-      switch(currentExerciseState) {
+      switch (currentExerciseState) {
         case "HANDS_UP":
 
           // mirrored first
@@ -390,7 +390,7 @@ function App() {
           areHandsUp(pose[0]["keypoints"][7].y, pose[0]["keypoints"][3].y, pose[0]["keypoints"][8].y, pose[0]["keypoints"][4].y)
 
           break;
-        
+
         case "LEAN_LEFT":
 
           // mirrored first
@@ -406,7 +406,7 @@ function App() {
           drawPoint(ctx, pose[0]["keypoints"][6].y * 1, pose[0]["keypoints"][6].x * 1, 3, "blue");
 
           isLeanCorrect(pose[0]["keypoints"][6].x, pose[0]["keypoints"][6].y, pose[0]["keypoints"][8].y, pose[0]["keypoints"][9].x)
-          
+
           break;
 
         case "LEAN_RIGHT":
@@ -424,8 +424,8 @@ function App() {
           drawPoint(ctx, pose[0]["keypoints"][5].y * 1, pose[0]["keypoints"][5].x * 1, 3, "blue");
 
           isLeanCorrect(pose[0]["keypoints"][5].x, pose[0]["keypoints"][5].y, pose[0]["keypoints"][7].y, pose[0]["keypoints"][10].x)
-          
-          break;    
+
+          break;
 
 
 
@@ -446,8 +446,8 @@ function App() {
         // drawText(50, 50, "Put left palm on your body where a circle is to begin", 24, colour1, SCALE, ctx)
 
 
-          
-        
+
+
         // case "run":
 
 
@@ -456,7 +456,7 @@ function App() {
 
         // // Check if arm is located aside body, warn if not
         // isArmAside(pose[0]["keypoints"][5], pose[0]["keypoints"][7], ctx, canvas, videoWidth)
-        
+
         // isWristAlgned(pose[0]["keypoints"][7], pose[0]["keypoints"][9], ctx, canvas, videoWidth)
 
 
@@ -471,14 +471,14 @@ function App() {
         //   } else {
         //     drawText(50, 50, "Move arm inside", 24, colour1, SCALE, ctx)
         //   }
-          
+
         //   drawRepetitions(ctx, canvas)
 
         //   determineExerciseState(pose[0]["keypoints"][5].x, pose[0]["keypoints"][9].x)     
-          
+
         //   //isShoulderStationary(pose[0]["keypoints"][5], pose[0]["keypoints"][6], ctx)
-          
-          
+
+
         //   break;
         // case "finish":
         //   drawText(50, 50, "Exercise finished", 24, colour1,  SCALE, ctx)
@@ -489,24 +489,24 @@ function App() {
         //   break;
         default:
           console.log("exercise state error occured. Restart page.");
-      } 
+      }
 
-      
+
     };
 
-  
 
-    
 
-      // main
-      //const [width, height] = useWindowSize();
-          
-      setupDetector();
-      
-      runDetection();
-      
 
-      
+
+    // main
+    //const [width, height] = useWindowSize();
+
+    setupDetector();
+
+    runDetection();
+
+
+
 
 
   }
@@ -515,14 +515,29 @@ function App() {
     currentExerciseState = state
   }
 
+  function setSizeUsingBrowserWidth() {
+
+    var browserWidth = window.innerWidth
+    console.log(browserWidth)
+
+    if (browserWidth >= 1280) {
+      return WIDTH
+    } else if (browserWidth >= 1024) {
+      return Math.round(WIDTH / 1.5)
+    } 
+
+    return Math.round(WIDTH/ 2)
+
+  }
+
   return (
-    
+
     <div className="App">
       <header className="App-header">
 
 
 
-      {/* <div style={{display : appState === 'begin' ? 'block' : 'none'}}>
+        {/* <div style={{display : appState === 'begin' ? 'block' : 'none'}}>
       <button onClick={() =>  setAppState("run")} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" >
         Begin
       </button>
@@ -538,7 +553,7 @@ function App() {
       </button>
       </div> */}
 
-{/*  
+        {/*  
       <div style={{display : appState === 'begin' ? 'block' : 'none'}}>
 
       </div>
@@ -547,109 +562,194 @@ function App() {
 
       </div> */}
 
-      <div class="flex flex-col space-y-4 ...">
 
 
-      <div class="flex flex-row space-x-4 my-5">
-        <div class="basis-1/3 rounded border-solid text-xl">
-          physioloop.io
-        
-{/*        
-        <button  onClick={() => {setAppState("run")}}>
-        (Re)Start
-        </button> */}
-       
 
+        <div class="flex-col space-y-4">
+          <div class="flex space-x-4 ">
+            <div class="basis-1/3 text-xl">
+              physioloop.io
+            </div>
+            <div class="basis-1/3 rounded border-solid border-2 border-blue-600 hover:bg-sky-700 text-2xl ">
+              <button onClick={() => { setAppState("run") }}>
+                Begin
+              </button>
+            </div>
+            <div class="basis-1/3 text-xl">
+              physioloop.io
+            </div>
+          </div>
+          <div class="flex special">
+            <div class="basis-1/2">grid column 1
+              <video id="video" width="640" height="480" autoPlay="autoplay" style={{
+                  position: "relative",
+                  marginLeft: "auto",
+                  marginRight: "auto",
+                  paddingTop: 20,
+                  left: 0,
+                  right: 0,
+                  // "z-index": 1,
+                }}>
+                  <source src={exerciseSource} type="video/mp4" />
+              </video>
+            </div>
+            <div class="relative basis-1/2" >grid column 2
+              <div className="webcam">
+                <Webcam
+                  ref={webcamRef}
+                  mirrored
+                  style={{
+                    position: "absolute",
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                    paddingTop: 20,
+                    left: 0,
+                    right: 0,
+                    textAlign: "center",
+                    // zindex: 0,
+                    width: setSizeUsingBrowserWidth(),
+                    // height: setSizeUsingBrowserHeight(),
+                  }}
+                />
+              </div>
+              
+              
+              <div className="canvas"> 
+                <canvas
+                  ref={canvasRef}
+                  style={{
+                    position: "absolute",
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                    paddingTop: 20,
+                    left: 0,
+                    right: 0,
+                    textAlign: "center",
+                    // "z-index": 2,
+                    width: setSizeUsingBrowserWidth(),
+                    // height: setSizeUsingBrowserHeight(),
+                  }}
+                />
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="basis-1/3 rounded border-solid border-2 border-blue-600 hover:bg-sky-700 text-2xl ">
 
-                 
-        <button  onClick={() => {setAppState("run")}}>
-        Begin
-        </button>
-        </div>
-        <div class="basis-1/3 rounded border-solid "> </div>
-      </div>
 
-      <div class="flex flex-row  ">
-       <div class=' h-128  max-h-full rounded border-solid border-2 border-blue-600 grow'> 
-       
-       <div className="video">
 
-        <video id="exerciseVideo" width="640" height="480" autoPlay="autoplay" style={{
-          position: "absolute",
-          marginLeft: "auto",
-          marginRight: "auto",
-          paddingTop: 20,
-          left: 0,
-          right: 0,
-          // "z-index": 1,
-        }}>
 
-<source src={exerciseSource} type="video/mp4" />
-      </video>
 
-       </div>
-       
-       </div>
-       <div className = "webcam">
+{/* 
 
-       <Webcam 
-              ref={webcamRef}
-              mirrored
-              style={{
-                position: "absolute",
+        <div class="flex flex-col space-y-4 ...">
+
+
+          <div class="flex space-x-4 my-5">
+            <div class="basis-1/3 text-xl">
+              physioloop.io
+
+
+
+            </div>
+            <div class="basis-1/3 rounded border-solid border-2 border-blue-600 hover:bg-sky-700 text-2xl ">
+
+
+              <button onClick={() => { setAppState("run") }}>
+                Begin
+              </button>
+            </div>
+            <div class="basis-1/3 rounded border-solid "> </div>
+          </div>
+
+          <div class="relative inline-block md:block ">
+
+ 
+              <div class="basis-1/2 flex-1">grid column 1
+
+              <div className="video">
+
+              <video id="exerciseVideo" width="640" height="480" autoPlay="autoplay" style={{
+                position: "relative",
                 marginLeft: "auto",
                 marginRight: "auto",
                 paddingTop: 20,
                 left: 0,
                 right: 0,
-                textAlign: "center",
-                // zindex: 0,
-                width: 640,
-                height: 480,
-              }}
-            /> 
+                // "z-index": 1,
+              }}>
 
-       </div>
-        
-        <div className="canvas">
-        <canvas
-          ref={canvasRef}
-          style={{
-            position: "absolute",
-            marginLeft: "auto",
-            marginRight: "auto",
-            paddingTop: 20,
-            left: 0,
-            right: 0,
-            textAlign: "center",
-            // "z-index": 2,
-            width: 640,
-            height: 480,
-          }}
-        />
+                <source src={exerciseSource} type="video/mp4" />
+              </video>
 
-        </div>
+              </div>
 
-       
-        
-        
-     
-      </div>
-      
+              </div>
+              <div class="display basis-1/2 webcam-canvas">grid column 2
 
-      <div class="flex flex-row">
-        <div class="basis-1/3"></div>
-        <div class="basis-1/3"></div>
-        <div class="basis-1/3">Exercise credits: <a href="https://www.youtube.com/c/YogawithUliana">Yoga with Uliana </a></div>
-      </div>
+                <div className="webcam">
 
-      </div> 
-      
-      
+                <Webcam
+                  ref={webcamRef}
+                  mirrored
+                  style={{
+                    position: "absolute",
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                    paddingTop: 20,
+                    left: 0,
+                    right: 0,
+                    textAlign: "center",
+                    // zindex: 0,
+                    width: 640,
+                    height: 480,
+                  }}
+                />
 
-      {/* <Helmet>
+                </div>
+
+                <div className="canvas">
+              <canvas
+              id="canvas"
+                ref={canvasRef}
+                style={{
+                  position: "absolute",
+                  marginLeft: "auto",
+                  marginRight: "auto",
+                  paddingTop: 20,
+                  left: 0,
+                  right: 0,
+                  textAlign: "center",
+                  // "z-index": 2,
+                  width: 640,
+                  height: 480,
+                }}
+              />
+
+            </div>
+
+
+              </div>
+            </div>
+
+
+
+          <div class="flex flex-row">
+            <div class="basis-1/3"></div>
+            <div class="basis-1/3"></div>
+            <div class="basis-1/3">Exercise credits: <a href="https://www.youtube.com/c/YogawithUliana">Yoga with Uliana </a></div>
+          </div>
+
+        </div> */}
+
+
+
+
+
+
+
+
+
+        {/* <Helmet>
           <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
           <title>Physioloop.io strech exercise</title>
       </Helmet>
