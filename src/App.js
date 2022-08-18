@@ -22,6 +22,7 @@ import MediaQuery from 'react-responsive'
 import { Container } from 'postcss';
 
 import exerciseSource from "./videos/exercise.mp4";
+import { nonMaxSuppressionV3Impl } from '@tensorflow/tfjs-core/dist/backends/non_max_suppression_impl';
 
 
 // Todo:
@@ -102,9 +103,10 @@ function App() {
       currentStopTime = points[index];
 
     var video = document.getElementById("video");
+    
     video.play();
-
-
+    video.pause();
+    setTimeout(() => {video.play();}, 3000);
 
 
 
@@ -184,11 +186,6 @@ function App() {
 
     function isReadyToStart(leftShoulder, rightShoulder, leftElbow, leftWrist, ctx) {
 
-      //console.log("sh: "+ Math.abs((rightShoulder.x - leftShoulder.x)) )
-      //console.log(leftWrist.x)
-      //console.log("r: " + (Math.abs((rightShoulder.x - leftShoulder.x)) - leftWrist.x))
-      // Wrist is around the middle of a chest
-
       const positionX = Math.abs((rightShoulder.x - leftShoulder.x) / 2 + leftShoulder.x)
       const positionY = leftElbow.y
       drawCircle(positionX, positionY, PX_THRESHOLD, ctx)
@@ -229,13 +226,7 @@ function App() {
 
       //console.log("runDetection A")
 
-      if (currentExerciseState == exerciseStates[2]) {
-        return
-      }
-
-      console.log("runDetection B")
-
-      // if (detector === null) {
+      // if (currentExerciseState == exerciseStates[2]) {
       //   return
       // }
 
@@ -305,7 +296,7 @@ function App() {
       clearInterval(interval)
       setTimeout(() => {
         startInterval()
-      }, 1000)
+      }, time)
 
     }
 
@@ -530,6 +521,13 @@ function App() {
 
   }
 
+  function hideLoadingScreenAfterTime(time) {
+
+    setTimeout(function () {
+      document.getElementById('loadingScreen').style.display="none"
+  }, time);
+  }
+
   return (
 
     <div className="App">
@@ -563,6 +561,46 @@ function App() {
       </div> */}
 
 
+        
+          <div id="loadingScreen" class="absolute bg-white bg-opacity-60 z-10 h-full w-full flex items-center justify-center">
+            <div class="flex items-center">
+              <div style={{display : appState === 'begin' ? 'block' : 'none'}}>
+                <button className="text-4xl bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded" onClick={() => { setAppState("run"); hideLoadingScreenAfterTime(2000)}}>
+                  Begin
+                </button>
+              </div>
+              <div style={{display : appState === 'run' ? 'block' : 'none'}}>
+                <svg class="animate-spin h-10 w-10 text-blue-700" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                </path>
+              </svg>
+              </div>
+            
+              {/* <span class="text-3xl mr-4">Loading</span> */}
+          
+              {/* <svg class="animate-spin h-5 w-5 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+                viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                </path>
+              </svg> */}
+          
+            </div>
+          </div>
+
+        
+
+        
+       
+
+    
+    
+
+
 
 
         <div class="flex-col space-y-4">
@@ -571,9 +609,9 @@ function App() {
               physioloop.io
             </div>
             <div class="basis-1/3 rounded border-solid border-2 border-blue-600 hover:bg-sky-700 text-2xl ">
-              <button onClick={() => { setAppState("run") }}>
+              {/* <button onClick={() => { setAppState("run") }}>
                 Begin
-              </button>
+              </button> */}
             </div>
             <div class="basis-1/3 text-xl">
               physioloop.io
@@ -635,212 +673,7 @@ function App() {
           </div>
         </div>
 
-
-
-
-
 {/* 
-
-        <div class="flex flex-col space-y-4 ...">
-
-
-          <div class="flex space-x-4 my-5">
-            <div class="basis-1/3 text-xl">
-              physioloop.io
-
-
-
-            </div>
-            <div class="basis-1/3 rounded border-solid border-2 border-blue-600 hover:bg-sky-700 text-2xl ">
-
-
-              <button onClick={() => { setAppState("run") }}>
-                Begin
-              </button>
-            </div>
-            <div class="basis-1/3 rounded border-solid "> </div>
-          </div>
-
-          <div class="relative inline-block md:block ">
-
- 
-              <div class="basis-1/2 flex-1">grid column 1
-
-              <div className="video">
-
-              <video id="exerciseVideo" width="640" height="480" autoPlay="autoplay" style={{
-                position: "relative",
-                marginLeft: "auto",
-                marginRight: "auto",
-                paddingTop: 20,
-                left: 0,
-                right: 0,
-                // "z-index": 1,
-              }}>
-
-                <source src={exerciseSource} type="video/mp4" />
-              </video>
-
-              </div>
-
-              </div>
-              <div class="display basis-1/2 webcam-canvas">grid column 2
-
-                <div className="webcam">
-
-                <Webcam
-                  ref={webcamRef}
-                  mirrored
-                  style={{
-                    position: "absolute",
-                    marginLeft: "auto",
-                    marginRight: "auto",
-                    paddingTop: 20,
-                    left: 0,
-                    right: 0,
-                    textAlign: "center",
-                    // zindex: 0,
-                    width: 640,
-                    height: 480,
-                  }}
-                />
-
-                </div>
-
-                <div className="canvas">
-              <canvas
-              id="canvas"
-                ref={canvasRef}
-                style={{
-                  position: "absolute",
-                  marginLeft: "auto",
-                  marginRight: "auto",
-                  paddingTop: 20,
-                  left: 0,
-                  right: 0,
-                  textAlign: "center",
-                  // "z-index": 2,
-                  width: 640,
-                  height: 480,
-                }}
-              />
-
-            </div>
-
-
-              </div>
-            </div>
-
-
-
-          <div class="flex flex-row">
-            <div class="basis-1/3"></div>
-            <div class="basis-1/3"></div>
-            <div class="basis-1/3">Exercise credits: <a href="https://www.youtube.com/c/YogawithUliana">Yoga with Uliana </a></div>
-          </div>
-
-        </div> */}
-
-
-
-
-
-
-
-
-
-        {/* <Helmet>
-          <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
-          <title>Physioloop.io strech exercise</title>
-      </Helmet>
-      <h1 className="text-3xl font-bold underline">
-      Hello world!
-    </h1>
-      <div> state: {currentExerciseState }</div>
-
-      <MediaQuery minWidth={1224}>
-        <Webcam
-              ref={webcamRef}
-              mirrored
-              style={{
-                position: "absolute",
-                marginLeft: "auto",
-                marginRight: "auto",
-                left: 0,
-                right: 0,
-                textAlign: "center",
-                zindex: 9,
-                width: 640,
-                height: 480,
-              }}
-            />
-
-        <canvas
-          ref={canvasRef}
-          style={{
-            position: "absolute",
-            marginLeft: "auto",
-            marginRight: "auto",
-            left: 0,
-            right: 0,
-            textAlign: "center",
-            zindex: 9,
-            width: 640,
-            height: 480,
-          }}
-      />
-
-        <div id='button'>
-        <button  onClick={() => {setAppState("run")}}>
-        (Re)Start
-        </button>
-        </div>
-
-
-      </MediaQuery>
-
-      <MediaQuery maxWidth={640}>
-        <Webcam
-              ref={webcamRef}
-              mirrored
-              style={{
-                position: "absolute",
-                marginLeft: "auto",
-                marginRight: "auto",
-                left: 0,
-                right: 0,
-                textAlign: "center",
-                zindex: 9,
-                width: (WIDTH * (vWidth / WIDTH)) * 0.8,
-                height: (HEIGHT * (vHeight / HEIGHT)) * 0.8,
-              }}
-            />
-
-        <canvas
-          ref={canvasRef}
-          style={{
-            position: "absolute",
-            marginLeft: "auto",
-            marginRight: "auto",
-            left: 0,
-            right: 0,
-            textAlign: "center",
-            zindex: 9,
-            width: (WIDTH * (vWidth / WIDTH)) * 0.8,
-            height: (HEIGHT * (vHeight / HEIGHT)) * 0.8,
-            
-          }}
-      />
-
-        <div id='button'>
-        <button  onClick={() => {setAppState("run")}}>
-        (Re)Start
-        </button>
-        </div>
-
-
-      </MediaQuery>
-
       <FPSStats /> */}
 
       </header>

@@ -60,6 +60,7 @@ relative-div {
   border: 1px solid red;
 }  
 
+
 @media (max-width: 1280px) {
    #video {
     width: 440px
