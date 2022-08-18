@@ -24,6 +24,8 @@ import { Container } from 'postcss';
 import exerciseSource from "./videos/exercise.mp4";
 import { nonMaxSuppressionV3Impl } from '@tensorflow/tfjs-core/dist/backends/non_max_suppression_impl';
 
+import {Link} from 'react-router-dom'
+
 
 // Todo:
 // 1. Start with fitting in a screen with hands up (2 sec?) alligned (check by wrist positions)
@@ -63,6 +65,10 @@ function App() {
 
   const [size, setSize] = useState([0, 0]);
 
+  const ALLOWED_ELBOW_BEND_ANGLE = 30
+
+  const [failedPositionsState, setFailedPositionsState] = useState("")
+  
 
   //console.log(appState)
 
@@ -102,7 +108,20 @@ function App() {
       index = 1,
       currentStopTime = points[index];
 
+      let failedPositions = new Set();
+      //let failedPositionsIndexes = new Set()
+   
+
+    // points.forEach(element => {let number = element.toString(); failedPositions.number = "blank"; console.log(element)})
+    // console.log("aa")
+    // console.log(failedPositions)
+
     var video = document.getElementById("video");
+
+    
+
+
+
     
     video.play();
     video.pause();
@@ -115,16 +134,30 @@ function App() {
     function checkTime() {
       console.log("positionCounter: " + positionCounter)
       console.log("index: " + index)
-      if ((video.currentTime >= currentStopTime) && (positionCounter < index)) {
-        video.pause();
-        if (points.length > ++index) {       // increase index and get next time
-          currentStopTime = points[index]
-        }
-        else {                               // or loop/next...
-          // done
-        }
-      }
-    }
+     console.log("cst " + currentStopTime)
+
+     if (currentStopTime === 42) {
+       video.pause();
+       clearInterval(interval)
+       setAppState("end")
+       setFailedPositionsState(failedPositions)
+       
+     }
+     if ((video.currentTime >= currentStopTime) ) {
+
+       // if position is not yet done, pause
+       if (positionCounter < index) {
+         video.pause();
+       }
+
+         if (points.length > ++index) {       // increase index and get next time
+             currentStopTime = points[index]
+         }
+         else {                               // or loop/next...
+             // done
+         }
+     }
+ }
 
     function determineExerciseState(leftShoulderX, leftWristX) {
 
@@ -219,7 +252,8 @@ function App() {
 
         detect();
 
-      }, 1000 / FPS);
+      // }, 1000 / FPS);
+    }, 500);
     }
 
     function runDetection() {
@@ -300,6 +334,44 @@ function App() {
 
     }
 
+    /*
+    * Calculates the angle ABC (in radians) 
+    *
+    * A first point, ex: {x: 0, y: 0}
+    * C second point
+    * B center point
+    */
+    function find_angle(A,B,C) {
+      var AB = Math.sqrt(Math.pow(B.x-A.x,2)+ Math.pow(B.y-A.y,2));    
+      var BC = Math.sqrt(Math.pow(B.x-C.x,2)+ Math.pow(B.y-C.y,2)); 
+      var AC = Math.sqrt(Math.pow(C.x-A.x,2)+ Math.pow(C.y-A.y,2));
+      return (Math.acos((BC*BC+AB*AB-AC*AC)/(2*BC*AB)) * 180) / Math.PI;
+    }
+
+    function isHandStraight(shoulder, elbow, wrist) {
+
+      console.log("is hand straight " + find_angle(shoulder, elbow, wrist))
+
+      if ((find_angle(shoulder, elbow, wrist) - 180 + ALLOWED_ELBOW_BEND_ANGLE) < 0) {
+        return false
+      }
+
+      return true
+
+    }
+
+
+    function drawLowerArmWrong(ctx, shoulder, elbow, wrist) {
+
+      drawPoint(ctx, shoulder.y * 1, shoulder.x * 1, 3, "red");
+      drawPoint(ctx, wrist.y * 1, wrist.x * 1, 3, "red");
+      drawSegment([shoulder.y, shoulder.x],
+      [elbow.y, elbow.x], "red", SCALE, ctx )
+
+      drawSegment([elbow.y, elbow.x],
+      [wrist.y, wrist.x], "red", SCALE, ctx )
+    }
+
     function areHandsUp(leftElbowY, leftEarY, rightElbowY, rightEarY) {
       if ((leftElbowY < leftEarY) && (rightElbowY < rightEarY)) {
         console.log(leftElbowY + " " + leftEarY)
@@ -317,7 +389,7 @@ function App() {
           side = "left"
         }
 
-        timeout(2000)
+        //timeout(2000)
         video.play();
         positionCounter++;
 
@@ -331,7 +403,7 @@ function App() {
         if ((shoulderX < wristX) && (shoulderY < elbowBelowY)) {
           console.log("GOOD LEAN left!!!")
           currentExerciseState = "HANDS_UP"
-          timeout(2000)
+          //timeout(2000)
           video.play();
           positionCounter++;
         }
@@ -339,7 +411,7 @@ function App() {
         if ((shoulderX > wristX) && (shoulderY < elbowBelowY)) {
           console.log("GOOD LEAN right!!!")
           currentExerciseState = "HANDS_UP"
-          timeout(2000)
+          //timeout(2000)
           video.play();
           positionCounter++;
         }
@@ -398,6 +470,12 @@ function App() {
 
           isLeanCorrect(pose[0]["keypoints"][6].x, pose[0]["keypoints"][6].y, pose[0]["keypoints"][8].y, pose[0]["keypoints"][9].x)
 
+          if(!isHandStraight(pose[0]["keypoints"][5], pose[0]["keypoints"][7], pose[0]["keypoints"][9])) {
+            failedPositions.add(points.indexOf(points[index]) + ", arm was bend while leaning left \n")
+            drawLowerArmWrong(ctx, pose[0]["keypoints"][5], pose[0]["keypoints"][7], pose[0]["keypoints"][9])
+          }
+
+
           break;
 
         case "LEAN_RIGHT":
@@ -415,6 +493,12 @@ function App() {
           drawPoint(ctx, pose[0]["keypoints"][5].y * 1, pose[0]["keypoints"][5].x * 1, 3, "blue");
 
           isLeanCorrect(pose[0]["keypoints"][5].x, pose[0]["keypoints"][5].y, pose[0]["keypoints"][7].y, pose[0]["keypoints"][10].x)
+
+          if(!isHandStraight(pose[0]["keypoints"][6], pose[0]["keypoints"][8], pose[0]["keypoints"][10])) {
+            failedPositions.add(points.indexOf(points[index]) + ", arm was bend while leaning right \n")
+            drawLowerArmWrong(ctx, pose[0]["keypoints"][6], pose[0]["keypoints"][8], pose[0]["keypoints"][10])
+          }
+
 
           break;
 
@@ -672,6 +756,52 @@ function App() {
             </div>
           </div>
         </div>
+
+
+{/** end message template */}
+
+        <div style={{display : appState === 'end' ? 'block' : 'none'}}>
+
+{/*https://tailwindui.com/components/application-ui/overlays/modals*/}
+
+<div class="relative z-10" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+
+  <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+
+  <div class="fixed z-10 inset-0 overflow-y-auto">
+    <div class="flex items-end sm:items-center justify-center min-h-full p-4 text-center sm:p-0">
+
+      <div class="relative bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg ">
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+         
+            <svg width="512px" height="512px" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path fill="#000" d="M256 16C123.5 16 16 123.5 16 256c0 132.6 107.5 240 240 240 132.6 0 240-107.4 240-240S388.6 16 256 16zm0 60c99.4 0 180 80.6 180 180s-80.6 180-180 180S76 355.4 76 256 156.6 76 256 76zm91.3 64.2c-6.5 0-12.5 2.4-16.8 8.2-52 70.1-69 96.5-106 169.8-8.4-11.1-65.6-72.4-93.9-94.1-14.2-10.9-41.3 27.2-31.6 37.1C142.6 306.1 220.1 406 232.7 405c21.4-1.7 75.1-136.8 148.8-233.7 8-10.4-15-31.3-34.2-31.1z"/></svg>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Exercise finished</h3>
+              <div class="mt-2">
+                <p class="text-sm text-gray-500">Your score is </p> 
+                <h4 class="text-lg leading-6 font-medium text-gray-900">{Object.keys(failedPositionsState)}</h4>
+              </div>
+              <div class="mt-2">
+                <p class="text-sm text-gray-500">Failed positions </p> 
+                <h4 class="text-lg leading-6 font-medium text-gray-900">{failedPositionsState}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-2 py-2 mx-10">
+          <button type="button" onClick={window.location.reload()} class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">Improve</button>
+          <Link to='physioloop.io'>
+          <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Rest</button>
+          </Link>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
 
 {/* 
       <FPSStats /> */}
