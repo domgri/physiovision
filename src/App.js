@@ -24,8 +24,6 @@ import { Container } from 'postcss';
 import exerciseSource from "./videos/exercise.mp4";
 import { nonMaxSuppressionV3Impl } from '@tensorflow/tfjs-core/dist/backends/non_max_suppression_impl';
 
-import {Link} from 'react-router-dom'
-
 
 // Todo:
 // 1. Start with fitting in a screen with hands up (2 sec?) alligned (check by wrist positions)
@@ -67,7 +65,7 @@ function App() {
 
   const ALLOWED_ELBOW_BEND_ANGLE = 30
 
-  const [failedPositionsState, setFailedPositionsState] = useState("")
+  const [failedPositionsState, setFailedPositionsState] = useState([])
   
 
   //console.log(appState)
@@ -140,7 +138,8 @@ function App() {
        video.pause();
        clearInterval(interval)
        setAppState("end")
-       setFailedPositionsState(failedPositions)
+       failedPositions.forEach(element => setFailedPositionsState(currentState => [...currentState, element]))
+       
        
      }
      if ((video.currentTime >= currentStopTime) ) {
@@ -471,7 +470,7 @@ function App() {
           isLeanCorrect(pose[0]["keypoints"][6].x, pose[0]["keypoints"][6].y, pose[0]["keypoints"][8].y, pose[0]["keypoints"][9].x)
 
           if(!isHandStraight(pose[0]["keypoints"][5], pose[0]["keypoints"][7], pose[0]["keypoints"][9])) {
-            failedPositions.add(points.indexOf(points[index]) + ", arm was bend while leaning left \n")
+            failedPositions.add(points.indexOf(points[index]) + ", leaning left")
             drawLowerArmWrong(ctx, pose[0]["keypoints"][5], pose[0]["keypoints"][7], pose[0]["keypoints"][9])
           }
 
@@ -495,7 +494,7 @@ function App() {
           isLeanCorrect(pose[0]["keypoints"][5].x, pose[0]["keypoints"][5].y, pose[0]["keypoints"][7].y, pose[0]["keypoints"][10].x)
 
           if(!isHandStraight(pose[0]["keypoints"][6], pose[0]["keypoints"][8], pose[0]["keypoints"][10])) {
-            failedPositions.add(points.indexOf(points[index]) + ", arm was bend while leaning right \n")
+            failedPositions.add(points.indexOf(points[index]) + ", leaning right")
             drawLowerArmWrong(ctx, pose[0]["keypoints"][6], pose[0]["keypoints"][8], pose[0]["keypoints"][10])
           }
 
@@ -782,20 +781,18 @@ function App() {
               <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Exercise finished</h3>
               <div class="mt-2">
                 <p class="text-sm text-gray-500">Your score is </p> 
-                <h4 class="text-lg leading-6 font-medium text-gray-900">{Object.keys(failedPositionsState)}</h4>
+                <h4 class="text-lg leading-6 font-medium text-gray-900">{100 - 5 * Object.keys(failedPositionsState).length}</h4>
               </div>
               <div class="mt-2">
                 <p class="text-sm text-gray-500">Failed positions </p> 
-                <h4 class="text-lg leading-6 font-medium text-gray-900">{failedPositionsState}</h4>
+                <h4 class="text-lg leading-6 font-medium text-gray-900">{failedPositionsState.map((item) => (<> <span>{item}</span>  <hr /></>))}</h4>
               </div>
             </div>
           </div>
         </div>
         <div class="bg-gray-50 px-2 py-2 mx-10">
-          <button type="button" onClick={window.location.reload()} class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">Improve</button>
-          <Link to='physioloop.io'>
+          <button type="button"  class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">Improve</button>
           <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Rest</button>
-          </Link>
         </div>
       </div>
     </div>
