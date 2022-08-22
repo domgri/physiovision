@@ -37,7 +37,7 @@ relative-div {
 
 .canvas {
   z-index: 3;
-  border: 1px solid red;
+  /* border: 1px solid red; */
 }
 
  /* .display {

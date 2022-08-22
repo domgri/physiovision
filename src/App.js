@@ -439,15 +439,15 @@ function App() {
           // mirrored first
           mirror(ctx, videoWidth)
 
-          // Exercise specific keypoints
-          // right elbow
-          drawPoint(ctx, pose[0]["keypoints"][8].y * 1, pose[0]["keypoints"][8].x * 1, 3, "red");
-          //left elbow
-          drawPoint(ctx, pose[0]["keypoints"][7].y * 1, pose[0]["keypoints"][7].x * 1, 3, "aqua");
-          //right ear
-          drawPoint(ctx, pose[0]["keypoints"][4].y * 1, pose[0]["keypoints"][4].x * 1, 3, "orange");
-          //left ear
-          drawPoint(ctx, pose[0]["keypoints"][3].y * 1, pose[0]["keypoints"][3].x * 1, 3, "blue");
+          // // Exercise specific keypoints
+          // // right elbow
+          // drawPoint(ctx, pose[0]["keypoints"][8].y * 1, pose[0]["keypoints"][8].x * 1, 3, "red");
+          // //left elbow
+          // drawPoint(ctx, pose[0]["keypoints"][7].y * 1, pose[0]["keypoints"][7].x * 1, 3, "aqua");
+          // //right ear
+          // drawPoint(ctx, pose[0]["keypoints"][4].y * 1, pose[0]["keypoints"][4].x * 1, 3, "orange");
+          // //left ear
+          // drawPoint(ctx, pose[0]["keypoints"][3].y * 1, pose[0]["keypoints"][3].x * 1, 3, "blue");
 
           areHandsUp(pose[0]["keypoints"][7].y, pose[0]["keypoints"][3].y, pose[0]["keypoints"][8].y, pose[0]["keypoints"][4].y)
 
@@ -458,14 +458,14 @@ function App() {
           // mirrored first
           mirror(ctx, videoWidth)
 
-          // Exercise specific keypoints
-          // left wrist
-          drawPoint(ctx, pose[0]["keypoints"][9].y * 1, pose[0]["keypoints"][9].x * 1, 3, "red");
+          // // Exercise specific keypoints
+          // // left wrist
+          // drawPoint(ctx, pose[0]["keypoints"][9].y * 1, pose[0]["keypoints"][9].x * 1, 3, "red");
 
-          //right elbow
-          drawPoint(ctx, pose[0]["keypoints"][8].y * 1, pose[0]["keypoints"][8].x * 1, 3, "aqua");
-          //right shoulder
-          drawPoint(ctx, pose[0]["keypoints"][6].y * 1, pose[0]["keypoints"][6].x * 1, 3, "blue");
+          // //right elbow
+          // drawPoint(ctx, pose[0]["keypoints"][8].y * 1, pose[0]["keypoints"][8].x * 1, 3, "aqua");
+          // //right shoulder
+          // drawPoint(ctx, pose[0]["keypoints"][6].y * 1, pose[0]["keypoints"][6].x * 1, 3, "blue");
 
           isLeanCorrect(pose[0]["keypoints"][6].x, pose[0]["keypoints"][6].y, pose[0]["keypoints"][8].y, pose[0]["keypoints"][9].x)
 
@@ -482,14 +482,14 @@ function App() {
           // mirrored first
           mirror(ctx, videoWidth)
 
-          // Exercise specific keypoints
-          // right wrist
-          drawPoint(ctx, pose[0]["keypoints"][10].y * 1, pose[0]["keypoints"][10].x * 1, 3, "red");
+          // // Exercise specific keypoints
+          // // right wrist
+          // drawPoint(ctx, pose[0]["keypoints"][10].y * 1, pose[0]["keypoints"][10].x * 1, 3, "red");
 
-          //left elbow
-          drawPoint(ctx, pose[0]["keypoints"][7].y * 1, pose[0]["keypoints"][7].x * 1, 3, "aqua");
-          //left shoulder
-          drawPoint(ctx, pose[0]["keypoints"][5].y * 1, pose[0]["keypoints"][5].x * 1, 3, "blue");
+          // //left elbow
+          // drawPoint(ctx, pose[0]["keypoints"][7].y * 1, pose[0]["keypoints"][7].x * 1, 3, "aqua");
+          // //left shoulder
+          // drawPoint(ctx, pose[0]["keypoints"][5].y * 1, pose[0]["keypoints"][5].x * 1, 3, "blue");
 
           isLeanCorrect(pose[0]["keypoints"][5].x, pose[0]["keypoints"][5].y, pose[0]["keypoints"][7].y, pose[0]["keypoints"][10].x)
 
@@ -691,17 +691,17 @@ function App() {
             <div class="basis-1/3 text-xl">
               physioloop.io
             </div>
-            <div class="basis-1/3 rounded border-solid border-2 border-blue-600 hover:bg-sky-700 text-2xl ">
-              {/* <button onClick={() => { setAppState("run") }}>
-                Begin
-              </button> */}
+            <div>
+
             </div>
+            {/* <div class="basis-1/3 rounded border-solid border-2 border-blue-600 hover:bg-sky-700 text-2xl ">
+            </div> */}
             <div class="basis-1/3 text-xl">
-              physioloop.io
+              
             </div>
           </div>
           <div class="flex special">
-            <div class="basis-1/2">grid column 1
+            <div class="basis-1/2">
               <video id="video" width="640" height="480" autoPlay="autoplay" style={{
                   position: "relative",
                   marginLeft: "auto",
@@ -714,7 +714,7 @@ function App() {
                   <source src={exerciseSource} type="video/mp4" />
               </video>
             </div>
-            <div class="relative basis-1/2" >grid column 2
+            <div class="relative basis-1/2" >
               <div className="webcam">
                 <Webcam
                   ref={webcamRef}
@@ -791,8 +791,8 @@ function App() {
           </div>
         </div>
         <div class="bg-gray-50 px-2 py-2 mx-10">
-          <button type="button"  class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">Improve</button>
-          <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Rest</button>
+          <button type="button" onClick={(e) => {e.preventDefault(); window.location.href='www.physioloop.io';}}  class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">Improve</button>
+          <button type="button" onClick={(e) => {e.preventDefault(); window.location.href='www.physioloop.io';}} class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Rest</button>
         </div>
       </div>
     </div>
