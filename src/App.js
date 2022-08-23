@@ -702,7 +702,7 @@ function App() {
           </div>
           <div class="flex special">
             <div class="basis-1/2">
-              <video id="video" width="640" height="480" autoPlay="autoplay" style={{
+              <video id="video" width="640" height="480" autoPlay="autoplay" playsinline style={{
                   position: "relative",
                   marginLeft: "auto",
                   marginRight: "auto",
