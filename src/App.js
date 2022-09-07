@@ -1,5 +1,7 @@
 import React, { useRef, useState } from "react";
-import Webcam from "react-webcam";
+
+import "./App.css";
+import "./css.css";
 
 import {
   hideLoadingScreenAfterTime,
@@ -7,72 +9,62 @@ import {
 } from "./exercises/utils";
 import { setupDetector, runDetection } from "./exercises/detector";
 
-import exerciseSource from "./videos/exercise.mp4";
+import exercise1 from "./videos/s1_1.mp4";
+import { checkPosition, playExerciseVideo } from "./exercises/main";
+
+import { detect } from "./exercises/detector";
+import LoadingScreen from "./components/LoadingScreen";
+import VideoComponent from "./components/VideoComponent";
+import WebcamCanvasComponent from "./components/WebcamCanvasComponent";
 
 function App() {
+  // "begin", "run", "end"
   const [appState, setAppState] = useState("begin");
+
+  const [exerciseNumber, setExerciseNumber] = useState(0);
 
   // Webcam setup
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
+
+  const exerciseVideoRef = useRef(null);
+  //let exerciseVideo = document.getElementById("video");
 
   // CONSTS
 
   const WIDTH = 640;
   //const HEIGHT = 480;
 
-  let exerciseState = "test";
-
   if (appState === "run") {
     console.log("run");
+    //exerciseVideo.play();
 
+    //exerciseVideo.play();
+    //playExerciseVideo(exerciseVideo);
+    // Start detection
     setupDetector();
-    runDetection(webcamRef, canvasRef, exerciseState);
+    //runDetection(webcamRef, canvasRef, exerciseVideo);
+
+    let interval = null;
+    let detectionObject = {};
+    interval = setInterval(() => {
+      detectionObject = detect(webcamRef);
+      console.log(detectionObject);
+      detectionObject["canvasRef"] = canvasRef;
+      checkPosition(detectionObject);
+
+      // }, 1000 / FPS);
+    }, 500);
   }
 
   return (
     <div className="App">
       <header className="App-header">
-        <div
-          id="loadingScreen"
-          className="absolute bg-white bg-opacity-60 z-10 h-full w-full flex items-center justify-center"
-        >
-          <div className="flex items-center">
-            <div style={{ display: appState === "begin" ? "block" : "none" }}>
-              <button
-                className="text-4xl bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded"
-                onClick={() => {
-                  setAppState("run");
-                  hideLoadingScreenAfterTime(2000);
-                }}
-              >
-                Begin
-              </button>
-            </div>
-            <div style={{ display: appState === "run" ? "block" : "none" }}>
-              <svg
-                className="animate-spin h-10 w-10 text-blue-700"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-            </div>
-          </div>
-        </div>
+        <LoadingScreen
+          appState={appState}
+          setAppState={setAppState}
+          exerciseVideoRef={exerciseVideoRef}
+        />
 
         <div className="flex-col space-y-4">
           <div className="flex space-x-4 ">
@@ -84,60 +76,17 @@ function App() {
           </div>
           <div className="flex special">
             <div className="basis-1/2">
-              <video
-                id="video"
-                width="640"
-                height="480"
-                autoPlay="autoplay"
-                playsInline
-                style={{
-                  position: "relative",
-                  marginLeft: "auto",
-                  marginRight: "auto",
-                  paddingTop: 20,
-                  left: 0,
-                  right: 0,
-                  // "z-index": 1,
-                }}
-              >
-                <source src={exerciseSource} type="video/mp4" />
-              </video>
+              <VideoComponent
+                exerciseVideoRef={exerciseVideoRef}
+                videoSrc={exercise1}
+              />
             </div>
             <div className="relative basis-1/2">
-              <div className="webcam">
-                <Webcam
-                  ref={webcamRef}
-                  mirrored
-                  style={{
-                    position: "absolute",
-                    marginLeft: "auto",
-                    marginRight: "auto",
-                    paddingTop: 20,
-                    left: 0,
-                    right: 0,
-                    textAlign: "center",
-                    // zindex: 0,
-                    width: setSizeUsingBrowserWidth(WIDTH),
-                  }}
-                />
-              </div>
-
-              <div className="canvas">
-                <canvas
-                  ref={canvasRef}
-                  style={{
-                    position: "absolute",
-                    marginLeft: "auto",
-                    marginRight: "auto",
-                    paddingTop: 20,
-                    left: 0,
-                    right: 0,
-                    textAlign: "center",
-                    // "z-index": 2,
-                    width: setSizeUsingBrowserWidth(WIDTH),
-                  }}
-                />
-              </div>
+              <WebcamCanvasComponent
+                webcamRef={webcamRef}
+                canvasRef={canvasRef}
+                width={WIDTH}
+              />
             </div>
           </div>
         </div>

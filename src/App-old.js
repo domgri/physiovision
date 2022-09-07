@@ -374,7 +374,13 @@ function App() {
 
           // // Exercise specific keypoints
           // // right elbow
-          // drawPoint(ctx, pose[0]["keypoints"][8].y * 1, pose[0]["keypoints"][8].x * 1, 3, "red");
+          drawPoint(
+            ctx,
+            pose[0]["keypoints"][8].y * 1,
+            pose[0]["keypoints"][8].x * 1,
+            3,
+            "red"
+          );
           // //left elbow
           // drawPoint(ctx, pose[0]["keypoints"][7].y * 1, pose[0]["keypoints"][7].x * 1, 3, "aqua");
           // //right ear
