@@ -3,26 +3,37 @@ import { drawPoint } from "./utilitiesCanvas";
 import exercise2 from "./../videos/s1_2.mp4";
 import exercise3 from "./../videos/s1_3.mp4";
 import { pauseVideo } from "../components/VideoComponent";
+import { shapeSimilarity } from "curve-matcher";
+import { detectPose } from "./detector";
 
 let exerciseState = "test";
 
-export function checkPosition(
-  poses,
+let exerciseVideoPoses = null;
+let exerciseVideoCurve = null;
+
+function mirror(ctx, videoWidth) {
+  ctx.translate(videoWidth, 0);
+  ctx.scale(-1, 1);
+}
+
+export async function checkPosition(
+  webcamPoses,
   webcamVideo,
   videoWidth,
   videoHeight,
   exerciseVideoRef,
+  exercisePoses,
   canvasRef
 ) {
   const ctx = canvasRef.current.getContext("2d");
   canvasRef.current.width = videoWidth;
   canvasRef.current.height = videoHeight;
 
+  mirror(ctx, videoWidth);
+
   //checkTime();
   switch (exerciseState) {
     case "test":
-      console.log("HELLO");
-
       // works
       //pauseVideo(exerciseVideoRef);
 
@@ -33,14 +44,135 @@ export function checkPosition(
       //     exerciseVideo.play();
       //   }, 1000);
 
-      console.log(poses);
       drawPoint(
         ctx,
-        poses[0]["keypoints"][4].y * 1,
-        poses[0]["keypoints"][4].x * 1,
+        webcamPoses[0]["keypoints"][0].y * 1,
+        webcamPoses[0]["keypoints"][0].x * 1,
         3,
         "orange"
       );
+
+      drawPoint(
+        ctx,
+        webcamPoses[0]["keypoints"][1].y * 1,
+        webcamPoses[0]["keypoints"][1].x * 1,
+        3,
+        "orange"
+      );
+      drawPoint(
+        ctx,
+        webcamPoses[0]["keypoints"][2].y * 1,
+        webcamPoses[0]["keypoints"][2].x * 1,
+        3,
+        "orange"
+      );
+      drawPoint(
+        ctx,
+        webcamPoses[0]["keypoints"][3].y * 1,
+        webcamPoses[0]["keypoints"][3].x * 1,
+        3,
+        "orange"
+      );
+      drawPoint(
+        ctx,
+        webcamPoses[0]["keypoints"][4].y * 1,
+        webcamPoses[0]["keypoints"][4].x * 1,
+        3,
+        "orange"
+      );
+
+      // if (exerciseVideoPoses === null) {
+      //   console.log("typeOfexvidref " + typeof exerciseVideoRef);
+      //   exerciseVideoPoses = await detectPose(exerciseVideoRef);
+      // }
+
+      // From left ear to right ear
+      const webcamCurve = [
+        {
+          x: webcamPoses[0]["keypoints"][4].x,
+          y: webcamPoses[0]["keypoints"][4].y,
+        },
+        {
+          x: webcamPoses[0]["keypoints"][2].x,
+          y: webcamPoses[0]["keypoints"][2].y,
+        },
+        {
+          x: webcamPoses[0]["keypoints"][0].x,
+          y: webcamPoses[0]["keypoints"][0].y,
+        },
+        {
+          x: webcamPoses[0]["keypoints"][1].x,
+          y: webcamPoses[0]["keypoints"][1].y,
+        },
+        {
+          x: webcamPoses[0]["keypoints"][3].x,
+          y: webcamPoses[0]["keypoints"][3].y,
+        },
+      ];
+
+      exerciseVideoCurve = [
+        {
+          x: exercisePoses[0]["keypoints"][4].x,
+          y: exercisePoses[0]["keypoints"][4].y,
+        },
+        {
+          x: exercisePoses[0]["keypoints"][2].x,
+          y: exercisePoses[0]["keypoints"][2].y,
+        },
+        {
+          x: exercisePoses[0]["keypoints"][0].x,
+          y: exercisePoses[0]["keypoints"][0].y,
+        },
+        {
+          x: exercisePoses[0]["keypoints"][1].x,
+          y: exercisePoses[0]["keypoints"][1].y,
+        },
+        {
+          x: exercisePoses[0]["keypoints"][3].x,
+          y: exercisePoses[0]["keypoints"][3].y,
+        },
+      ];
+
+      const similarity = shapeSimilarity(webcamCurve, exerciseVideoCurve);
+      console.log(similarity);
+
+    // if (
+    //   exerciseVideoPoses !== null &&
+    //   exerciseVideoPoses &&
+    //   Object.keys(exerciseVideoPoses).length === 0 &&
+    //   Object.getPrototypeOf(exerciseVideoPoses) === Object.prototype
+    // ) {
+    //   console.log(typeof exerciseVideoPoses);
+    //   exerciseVideoCurve = [
+    //     {
+    //       x: exercisePoses[0]["keypoints"][4].x,
+    //       y: exercisePoses[0]["keypoints"][4].y,
+    //     },
+    //     {
+    //       x: exercisePoses[0]["keypoints"][2].x,
+    //       y: exercisePoses[0]["keypoints"][2].y,
+    //     },
+    //     {
+    //       x: exercisePoses[0]["keypoints"][0].x,
+    //       y: exercisePoses[0]["keypoints"][0].y,
+    //     },
+    //     {
+    //       x: exercisePoses[0]["keypoints"][1].x,
+    //       y: exercisePoses[0]["keypoints"][1].y,
+    //     },
+    //     {
+    //       x: exercisePoses[0]["keypoints"][3].x,
+    //       y: exercisePoses[0]["keypoints"][3].y,
+    //     },
+    //   ];
+
+    //   const similarity = shapeSimilarity(webcamCurve, exerciseVideoCurve);
+    //   console.log(similarity);
+    // } else {
+    //   console.log("else");
+    // }
+
+    //drawSegment([poses[0]["keypoints"][1].y, poses[0]["keypoints"][1].x], [ poses[0]["keypoints"][3].y,  poses[0]["keypoints"][3].x], colour2, SCALE, ctx)
 
     case "HANDS_UP":
       // mirrored first

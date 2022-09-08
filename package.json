@@ -32,6 +32,7 @@
     "@tensorflow/tfjs-core": "^3.19.0",
     "@tensorflow/tfjs-node": "^3.19.0",
     "awesome-typescript-loader": "^5.2.1",
+    "curve-matcher": "^1.1.1",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "react-fps-stats": "^0.2.3",
