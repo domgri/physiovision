@@ -2,42 +2,29 @@ import { drawPoint } from "./utilitiesCanvas";
 
 import exercise2 from "./../videos/s1_2.mp4";
 import exercise3 from "./../videos/s1_3.mp4";
-import { playVideo } from "../App";
+import { pauseVideo } from "../components/VideoComponent";
 
 let exerciseState = "test";
 
-// export function checkPosition(
-//   poses,
-//   webcamVideo,
-//   videoWidth,
-//   videoHeight,
-//   exerciseVideoRef,
-//   canvas
-// ) {
-export function checkPosition(detectionObject) {
-  let poses = detectionObject.poses;
-  let webcamVideo = detectionObject.webcamVideo;
-  let videoWidth = detectionObject.videoWidth;
-  let videoHeight = detectionObject.videoHeight;
-  let canvasRef = detectionObject.canvasRef;
-
-  console.log("checkPosition");
-  console.log(detectionObject);
+export function checkPosition(
+  poses,
+  webcamVideo,
+  videoWidth,
+  videoHeight,
+  exerciseVideoRef,
+  canvasRef
+) {
   const ctx = canvasRef.current.getContext("2d");
   canvasRef.current.width = videoWidth;
   canvasRef.current.height = videoHeight;
-
-  console.log("what");
 
   //checkTime();
   switch (exerciseState) {
     case "test":
       console.log("HELLO");
-      //console.log(exerciseVideoRef);
-      //playVideo(exerciseVideoRef);
-      // exerciseVideoRef.current.defaultMuted = true;
-      // exerciseVideoRef.current.muted = true;
-      // exerciseVideoRef.current.play();
+
+      // works
+      //pauseVideo(exerciseVideoRef);
 
       //exerciseVideoRef.current.play();
       //playExerciseVideo(exerciseVideoRef);

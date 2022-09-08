@@ -4,6 +4,10 @@ export function playVideo(exerciseVideoRef) {
   exerciseVideoRef.current.play();
 }
 
+export function pauseVideo(exerciseVideoRef) {
+  exerciseVideoRef.current.pause();
+}
+
 let exerciseVideo = document.getElementById("video");
 
 const VideoComponent = ({ exerciseVideoRef, videoSrc }) => {

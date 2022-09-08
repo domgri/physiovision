@@ -36,23 +36,13 @@ function App() {
   //const HEIGHT = 480;
 
   if (appState === "run") {
-    console.log("run");
-    //exerciseVideo.play();
-
-    //exerciseVideo.play();
-    //playExerciseVideo(exerciseVideo);
     // Start detection
     setupDetector();
-    //runDetection(webcamRef, canvasRef, exerciseVideo);
 
     let interval = null;
-    let detectionObject = {};
-    interval = setInterval(() => {
-      detectionObject = detect(webcamRef);
-      console.log(detectionObject);
-      detectionObject["canvasRef"] = canvasRef;
-      checkPosition(detectionObject);
 
+    interval = setInterval(() => {
+      detect(webcamRef, canvasRef, exerciseVideoRef);
       // }, 1000 / FPS);
     }, 500);
   }
