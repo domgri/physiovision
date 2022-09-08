@@ -9,6 +9,7 @@ import {
 } from "./exercises/utils";
 import { setupDetector, runDetection } from "./exercises/detector";
 
+import prepVideo from "./videos/prep.mp4";
 import exercise1 from "./videos/s1_1.mp4";
 import { checkPosition, playExerciseVideo } from "./exercises/main";
 
@@ -18,7 +19,7 @@ import VideoComponent from "./components/VideoComponent";
 import WebcamCanvasComponent from "./components/WebcamCanvasComponent";
 
 function App() {
-  // "begin", "run", "end"
+  // "begin", "prepare", "run", "end"
   const [appState, setAppState] = useState("begin");
 
   const [exerciseNumber, setExerciseNumber] = useState(0);
@@ -35,16 +36,24 @@ function App() {
   const WIDTH = 640;
   //const HEIGHT = 480;
 
-  if (appState === "run") {
+  if (appState === "prepare") {
     // Start detection
     setupDetector();
 
     let interval = null;
 
     interval = setInterval(() => {
-      detect(webcamRef, canvasRef, exerciseVideoRef);
+      detect(
+        webcamRef,
+        canvasRef,
+        exerciseVideoRef,
+        appState,
+        setAppState,
+        interval
+      );
       // }, 1000 / FPS);
     }, 500);
+  } else if (appState === "run") {
   }
 
   return (
@@ -68,7 +77,7 @@ function App() {
             <div className="basis-1/2">
               <VideoComponent
                 exerciseVideoRef={exerciseVideoRef}
-                videoSrc={exercise1}
+                videoSrc={prepVideo}
               />
             </div>
             <div className="relative basis-1/2">

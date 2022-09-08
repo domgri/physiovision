@@ -1,15 +1,25 @@
 import { drawPoint } from "./utilitiesCanvas";
 
-import exercise2 from "./../videos/s1_2.mp4";
-import exercise3 from "./../videos/s1_3.mp4";
+import notificationSoundSource from "./../audio/notification.wav";
+// import exercise2 from "./../videos/s1_2.mp4";
+// import exercise3 from "./../videos/s1_3.mp4";
 import { pauseVideo } from "../components/VideoComponent";
 import { shapeSimilarity } from "curve-matcher";
 import { detectPose } from "./detector";
 
-let exerciseState = "test";
+// "fitToCamera", "up", "right", "left", "down"
+let exerciseSubstate = "fitToCamera";
+
+let pausePoints = [0, 8, 24, 34, 40, 47],
+  currentPausePointIndex = 1,
+  currentPauseTime = pausePoints[currentPausePointIndex];
+
+let positionCounter = 0;
 
 let exerciseVideoPoses = null;
 let exerciseVideoCurve = null;
+
+let capturedPoses = { up: null, right: null, down: null, left: null };
 
 function mirror(ctx, videoWidth) {
   ctx.translate(videoWidth, 0);
@@ -22,17 +32,130 @@ export async function checkPosition(
   videoWidth,
   videoHeight,
   exerciseVideoRef,
-  exercisePoses,
-  canvasRef
+  //exercisePoses,
+  canvasRef,
+  appState,
+  setAppState,
+  interval
 ) {
   const ctx = canvasRef.current.getContext("2d");
   canvasRef.current.width = videoWidth;
   canvasRef.current.height = videoHeight;
 
   mirror(ctx, videoWidth);
+  checkTime(exerciseVideoRef, interval, setAppState);
 
-  //checkTime();
-  switch (exerciseState) {
+  //TODO: make loading screen activ euntil detector properly loads...
+
+  switch (appState) {
+    case "prepare":
+      console.log(exerciseSubstate);
+      switch (exerciseSubstate) {
+        case "fitToCamera":
+          // If fits, move on, else wait until fits
+          // Check by checking all five head points' confidence. Should be above 50.
+
+          if (exerciseVideoRef.current.paused) {
+            if (
+              webcamPoses[0]["keypoints"][0].score * 100 > 50 &&
+              webcamPoses[0]["keypoints"][1].score * 100 > 50 &&
+              webcamPoses[0]["keypoints"][2].score * 100 > 50 &&
+              webcamPoses[0]["keypoints"][3].score * 100 > 50 &&
+              webcamPoses[0]["keypoints"][4].score * 100 > 50
+            ) {
+              exerciseSubstate = "up";
+
+              await setTimeout(() => {
+                playNotification();
+                exerciseVideoRef.current.play();
+              }, 1000);
+            }
+          }
+
+          // if (
+          //   webcamPoses[0]["keypoints"][0].score * 100 > 50 &&
+          //   webcamPoses[0]["keypoints"][1].score * 100 > 50 &&
+          //   webcamPoses[0]["keypoints"][2].score * 100 > 50 &&
+          //   webcamPoses[0]["keypoints"][3].score * 100 > 50 &&
+          //   webcamPoses[0]["keypoints"][4].score * 100 > 50
+          // ) {
+          //   console.log("in screen");
+          //   console.log(exerciseVideoRef.current);
+          // } else {
+          //   console.log("not in screen");
+          //   console.log(exerciseVideoRef.current.paused);
+          // }
+          // console.log(webcamPoses[0]["keypoints"][0].score);
+          // console.log(webcamPoses[0]["keypoints"][1].score);
+          // console.log(webcamPoses[0]["keypoints"][2].score);
+          // console.log(webcamPoses[0]["keypoints"][3].score);
+          // console.log(webcamPoses[0]["keypoints"][4].score);
+          //console.log("fitToCamera");
+
+          //playNotification()
+
+          //exerciseSubstate = "up";
+          break;
+        case "up":
+          // Tell to move head upward as much as possible and stay still until hear notification sound. It is normal to not see the screen while doing an exercise.
+          // Capture and store pose before notification sound. move substate to next.
+          console.log("up");
+
+          if (exerciseVideoRef.current.paused) {
+            await setTimeout(() => {
+              capturedPoses.up = [
+                webcamPoses[0]["keypoints"][0],
+                webcamPoses[0]["keypoints"][1],
+                webcamPoses[0]["keypoints"][2],
+                webcamPoses[0]["keypoints"][3],
+                webcamPoses[0]["keypoints"][4],
+              ];
+            }, 1000);
+            exerciseSubstate = "right";
+            await setTimeout(() => {
+              playNotification();
+              exerciseVideoRef.current.play();
+            }, 1000);
+
+            // if (
+            //   webcamPoses[0]["keypoints"][0].score * 100 > 50 &&
+            //   webcamPoses[0]["keypoints"][1].score * 100 > 50 &&
+            //   webcamPoses[0]["keypoints"][2].score * 100 > 50 &&
+            //   webcamPoses[0]["keypoints"][3].score * 100 > 50 &&
+            //   webcamPoses[0]["keypoints"][4].score * 100 > 50
+            // ) {
+            //   exerciseSubstate = "up";
+            //   playNotification();
+            //   setTimeout(() => {
+            //     exerciseVideoRef.current.play();
+            //   }, 1000);
+            // }
+          }
+
+          //exerciseSubstate = "right";
+          break;
+        case "right":
+          // repeat insttructions
+          // capture the same
+          console.log("right");
+          //exerciseSubstate = "down";
+          break;
+        case "down":
+          // repeat insttructions
+          // capture the same
+          console.log("down");
+          exerciseSubstate = "left";
+          break;
+        case "left":
+          // repeat insttructions
+          // capture the same
+          console.log("left");
+          exerciseSubstate = "up";
+          break;
+        default:
+          console.log("something is wrong with subState");
+      }
+      break;
     case "test":
       // works
       //pauseVideo(exerciseVideoRef);
@@ -81,11 +204,6 @@ export async function checkPosition(
         "orange"
       );
 
-      // if (exerciseVideoPoses === null) {
-      //   console.log("typeOfexvidref " + typeof exerciseVideoRef);
-      //   exerciseVideoPoses = await detectPose(exerciseVideoRef);
-      // }
-
       // From left ear to right ear
       const webcamCurve = [
         {
@@ -110,67 +228,31 @@ export async function checkPosition(
         },
       ];
 
-      exerciseVideoCurve = [
-        {
-          x: exercisePoses[0]["keypoints"][4].x,
-          y: exercisePoses[0]["keypoints"][4].y,
-        },
-        {
-          x: exercisePoses[0]["keypoints"][2].x,
-          y: exercisePoses[0]["keypoints"][2].y,
-        },
-        {
-          x: exercisePoses[0]["keypoints"][0].x,
-          y: exercisePoses[0]["keypoints"][0].y,
-        },
-        {
-          x: exercisePoses[0]["keypoints"][1].x,
-          y: exercisePoses[0]["keypoints"][1].y,
-        },
-        {
-          x: exercisePoses[0]["keypoints"][3].x,
-          y: exercisePoses[0]["keypoints"][3].y,
-        },
-      ];
+    // exerciseVideoCurve = [
+    //   {
+    //     x: exercisePoses[0]["keypoints"][4].x,
+    //     y: exercisePoses[0]["keypoints"][4].y,
+    //   },
+    //   {
+    //     x: exercisePoses[0]["keypoints"][2].x,
+    //     y: exercisePoses[0]["keypoints"][2].y,
+    //   },
+    //   {
+    //     x: exercisePoses[0]["keypoints"][0].x,
+    //     y: exercisePoses[0]["keypoints"][0].y,
+    //   },
+    //   {
+    //     x: exercisePoses[0]["keypoints"][1].x,
+    //     y: exercisePoses[0]["keypoints"][1].y,
+    //   },
+    //   {
+    //     x: exercisePoses[0]["keypoints"][3].x,
+    //     y: exercisePoses[0]["keypoints"][3].y,
+    //   },
+    // ];
 
-      const similarity = shapeSimilarity(webcamCurve, exerciseVideoCurve);
-      console.log(similarity);
-
-    // if (
-    //   exerciseVideoPoses !== null &&
-    //   exerciseVideoPoses &&
-    //   Object.keys(exerciseVideoPoses).length === 0 &&
-    //   Object.getPrototypeOf(exerciseVideoPoses) === Object.prototype
-    // ) {
-    //   console.log(typeof exerciseVideoPoses);
-    //   exerciseVideoCurve = [
-    //     {
-    //       x: exercisePoses[0]["keypoints"][4].x,
-    //       y: exercisePoses[0]["keypoints"][4].y,
-    //     },
-    //     {
-    //       x: exercisePoses[0]["keypoints"][2].x,
-    //       y: exercisePoses[0]["keypoints"][2].y,
-    //     },
-    //     {
-    //       x: exercisePoses[0]["keypoints"][0].x,
-    //       y: exercisePoses[0]["keypoints"][0].y,
-    //     },
-    //     {
-    //       x: exercisePoses[0]["keypoints"][1].x,
-    //       y: exercisePoses[0]["keypoints"][1].y,
-    //     },
-    //     {
-    //       x: exercisePoses[0]["keypoints"][3].x,
-    //       y: exercisePoses[0]["keypoints"][3].y,
-    //     },
-    //   ];
-
-    //   const similarity = shapeSimilarity(webcamCurve, exerciseVideoCurve);
-    //   console.log(similarity);
-    // } else {
-    //   console.log("else");
-    // }
+    // const similarity = shapeSimilarity(webcamCurve, exerciseVideoCurve);
+    // console.log(similarity);
 
     //drawSegment([poses[0]["keypoints"][1].y, poses[0]["keypoints"][1].x], [ poses[0]["keypoints"][3].y,  poses[0]["keypoints"][3].x], colour2, SCALE, ctx)
 
@@ -280,6 +362,33 @@ export async function checkPosition(
   }
 }
 
-export function playExerciseVideo(exerciseVideo) {
-  exerciseVideo.play();
+function checkTime(exerciseVideoRef, interval, setAppState) {
+  if (currentPauseTime === pausePoints[pausePoints.length - 1]) {
+    exerciseVideoRef.current.pause();
+    clearInterval(interval);
+    setAppState("end");
+    // failedPositions.forEach((element) =>
+    //   setFailedPositionsState((currentState) => [...currentState, element])
+    // );
+  }
+  if (exerciseVideoRef.current.currentTime >= currentPauseTime) {
+    // if position is not yet done, pause
+    if (positionCounter < currentPausePointIndex) {
+      exerciseVideoRef.current.pause();
+    }
+
+    if (pausePoints.length > ++currentPausePointIndex) {
+      // increase index and get next time
+      currentPauseTime = pausePoints[currentPausePointIndex];
+    } else {
+      // or loop/next...
+      // done
+    }
+  }
+}
+
+async function playNotification() {
+  let audio = new Audio(notificationSoundSource);
+
+  await audio.play();
 }

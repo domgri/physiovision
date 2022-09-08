@@ -15,7 +15,7 @@ const LoadingScreen = ({ appState, setAppState, exerciseVideoRef }) => {
             <button
               className="text-4xl bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded"
               onClick={() => {
-                setAppState("run");
+                setAppState("prepare");
                 //setAppState("run");
                 hideLoadingScreenAfterTime(2000);
                 playVideo(exerciseVideoRef);
@@ -24,7 +24,7 @@ const LoadingScreen = ({ appState, setAppState, exerciseVideoRef }) => {
               Begin
             </button>
           </div>
-          <div style={{ display: appState === "run" ? "block" : "none" }}>
+          <div style={{ display: appState === "prepare" ? "block" : "none" }}>
             <svg
               className="animate-spin h-10 w-10 text-blue-700"
               xmlns="http://www.w3.org/2000/svg"

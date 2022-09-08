@@ -15,7 +15,14 @@ export const setupDetector = async () => {
   );
 };
 
-export const detect = async (webcamRef, canvasRef, exerciseVideoRef) => {
+export const detect = async (
+  webcamRef,
+  canvasRef,
+  exerciseVideoRef,
+  appState,
+  setAppState,
+  interval
+) => {
   if (detector === null) {
     return;
   }
@@ -36,10 +43,10 @@ export const detect = async (webcamRef, canvasRef, exerciseVideoRef) => {
 
     const webcamPoses = await detector.estimatePoses(webcamVideo);
 
-    exerciseVideoRef.current.width = videoWidth;
-    exerciseVideoRef.current.height = videoHeight;
-    const exerciseVideo = exerciseVideoRef.current;
-    const exercisePoses = await detector.estimatePoses(exerciseVideo);
+    // exerciseVideoRef.current.width = videoWidth;
+    // exerciseVideoRef.current.height = videoHeight;
+    // const exerciseVideo = exerciseVideoRef.current;
+    // const exercisePoses = await detector.estimatePoses(exerciseVideo);
 
     checkPosition(
       webcamPoses,
@@ -47,8 +54,11 @@ export const detect = async (webcamRef, canvasRef, exerciseVideoRef) => {
       videoWidth,
       videoHeight,
       exerciseVideoRef,
-      exercisePoses,
-      canvasRef
+      //exercisePoses,
+      canvasRef,
+      appState,
+      setAppState,
+      interval
     );
   }
 };
