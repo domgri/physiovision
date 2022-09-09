@@ -10,7 +10,7 @@ import { detectPose } from "./detector";
 // "fitToCamera", "up", "right", "left", "down"
 let exerciseSubstate = "fitToCamera";
 
-let pausePoints = [0, 8, 24, 34, 40, 47],
+let pausePoints = [0, 8, 24, 34, 40, 47, 52, 53],
   currentPausePointIndex = 1,
   currentPauseTime = pausePoints[currentPausePointIndex];
 
@@ -63,11 +63,13 @@ export async function checkPosition(
               webcamPoses[0]["keypoints"][3].score * 100 > 50 &&
               webcamPoses[0]["keypoints"][4].score * 100 > 50
             ) {
-              exerciseSubstate = "up";
+              Promise.all([
+                playNotification(),
+                exerciseVideoRef.current.play(),
+              ]);
 
-              await setTimeout(() => {
-                playNotification();
-                exerciseVideoRef.current.play();
+              setTimeout(() => {
+                exerciseSubstate = "up";
               }, 1000);
             }
           }
@@ -102,20 +104,27 @@ export async function checkPosition(
           console.log("up");
 
           if (exerciseVideoRef.current.paused) {
-            await setTimeout(() => {
-              capturedPoses.up = [
+            console.log("inside1");
+            Promise.all([
+              (capturedPoses.up = [
                 webcamPoses[0]["keypoints"][0],
                 webcamPoses[0]["keypoints"][1],
                 webcamPoses[0]["keypoints"][2],
                 webcamPoses[0]["keypoints"][3],
                 webcamPoses[0]["keypoints"][4],
-              ];
-            }, 1000);
-            exerciseSubstate = "right";
+              ]),
+              console.log("inside2"),
+              playNotification(),
+              exerciseVideoRef.current.play(),
+            ]);
+            console.log("inside3");
             await setTimeout(() => {
-              playNotification();
-              exerciseVideoRef.current.play();
+              exerciseSubstate = "right";
             }, 1000);
+
+            // setTimeout(() => {
+
+            // }, 1000);
 
             // if (
             //   webcamPoses[0]["keypoints"][0].score * 100 > 50 &&
@@ -139,18 +148,76 @@ export async function checkPosition(
           // capture the same
           console.log("right");
           //exerciseSubstate = "down";
+
+          if (exerciseVideoRef.current.paused) {
+            Promise.all([
+              (capturedPoses.right = [
+                webcamPoses[0]["keypoints"][0],
+                webcamPoses[0]["keypoints"][1],
+                webcamPoses[0]["keypoints"][2],
+                webcamPoses[0]["keypoints"][3],
+                webcamPoses[0]["keypoints"][4],
+              ]),
+              playNotification(),
+              exerciseVideoRef.current.play(),
+            ]);
+            await setTimeout(() => {
+              exerciseSubstate = "down";
+            }, 1000);
+          }
+
           break;
         case "down":
           // repeat insttructions
           // capture the same
           console.log("down");
-          exerciseSubstate = "left";
+
+          if (exerciseVideoRef.current.paused) {
+            console.log("inside1");
+            Promise.all([
+              (capturedPoses.down = [
+                webcamPoses[0]["keypoints"][0],
+                webcamPoses[0]["keypoints"][1],
+                webcamPoses[0]["keypoints"][2],
+                webcamPoses[0]["keypoints"][3],
+                webcamPoses[0]["keypoints"][4],
+              ]),
+              console.log("inside2"),
+              playNotification(),
+              exerciseVideoRef.current.play(),
+            ]);
+            console.log("inside3");
+            await setTimeout(() => {
+              exerciseSubstate = "left";
+            }, 1000);
+          }
+
           break;
         case "left":
           // repeat insttructions
           // capture the same
           console.log("left");
-          exerciseSubstate = "up";
+
+          if (exerciseVideoRef.current.paused) {
+            Promise.all([
+              (capturedPoses.left = [
+                webcamPoses[0]["keypoints"][0],
+                webcamPoses[0]["keypoints"][1],
+                webcamPoses[0]["keypoints"][2],
+                webcamPoses[0]["keypoints"][3],
+                webcamPoses[0]["keypoints"][4],
+              ]),
+              playNotification(),
+              exerciseVideoRef.current.play(),
+            ]);
+            await setTimeout(() => {
+              exerciseSubstate = "exit_test";
+            }, 1000);
+          }
+
+          break;
+        case "exit_test":
+          console.log(capturedPoses);
           break;
         default:
           console.log("something is wrong with subState");
@@ -363,6 +430,9 @@ export async function checkPosition(
 }
 
 function checkTime(exerciseVideoRef, interval, setAppState) {
+  console.log(
+    "1- " + currentPauseTime + "  ,2- " + pausePoints[pausePoints.length - 1]
+  );
   if (currentPauseTime === pausePoints[pausePoints.length - 1]) {
     exerciseVideoRef.current.pause();
     clearInterval(interval);
