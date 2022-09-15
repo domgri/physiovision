@@ -9,6 +9,7 @@ import {
 } from "./exercises/utils";
 import { setupDetector, runDetection } from "./exercises/detector";
 
+import fullNeckVideo from "./videos/neck_exercise_full.mp4";
 import prepVideo from "./videos/prep.mp4";
 import exercise1 from "./videos/s1_1.mp4";
 import { checkPosition, playExerciseVideo } from "./exercises/main";
@@ -77,7 +78,7 @@ function App() {
             <div className="basis-1/2">
               <VideoComponent
                 exerciseVideoRef={exerciseVideoRef}
-                videoSrc={prepVideo}
+                videoSrc={fullNeckVideo}
               />
             </div>
             <div className="relative basis-1/2">

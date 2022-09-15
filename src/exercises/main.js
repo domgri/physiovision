@@ -8,9 +8,11 @@ import { shapeSimilarity } from "curve-matcher";
 import { detectPose } from "./detector";
 
 // "fitToCamera", "up", "right", "left", "down"
+let exerciseState = "prepare";
 let exerciseSubstate = "fitToCamera";
+let exerciseSubSubstate = "0";
 
-let pausePoints = [0, 8, 24, 34, 40, 47, 52, 53],
+let pausePoints = [0, 8, 24, 34, 40, 47, 57, 63, 68, 73, 78],
   currentPausePointIndex = 1,
   currentPauseTime = pausePoints[currentPausePointIndex];
 
@@ -24,6 +26,110 @@ let capturedPoses = { up: null, right: null, down: null, left: null };
 function mirror(ctx, videoWidth) {
   ctx.translate(videoWidth, 0);
   ctx.scale(-1, 1);
+}
+
+function getShapeSimilarityFromPoints(currentPoses, capturedPoses) {
+  console.log(currentPoses);
+  let currentCurve = [
+    {
+      x: currentPoses[4].x,
+      y: currentPoses[4].y,
+    },
+    {
+      x: currentPoses[2].x,
+      y: currentPoses[2].y,
+    },
+    {
+      x: currentPoses[0].x,
+      y: currentPoses[0].y,
+    },
+    {
+      x: currentPoses[1].x,
+      y: currentPoses[1].y,
+    },
+    {
+      x: currentPoses[3].x,
+      y: currentPoses[3].y,
+    },
+  ];
+
+  let capturedCurve = [
+    {
+      x: capturedPoses[4].x,
+      y: capturedPoses[4].y,
+    },
+    {
+      x: capturedPoses[2].x,
+      y: capturedPoses[2].y,
+    },
+    {
+      x: capturedPoses[0].x,
+      y: capturedPoses[0].y,
+    },
+    {
+      x: capturedPoses[1].x,
+      y: capturedPoses[1].y,
+    },
+    {
+      x: capturedPoses[3].x,
+      y: capturedPoses[3].y,
+    },
+  ];
+
+  return shapeSimilarity(currentCurve, capturedCurve);
+}
+
+function getCurrentPose(webcamPoses) {
+  return [
+    webcamPoses[0]["keypoints"][0],
+    webcamPoses[0]["keypoints"][1],
+    webcamPoses[0]["keypoints"][2],
+    webcamPoses[0]["keypoints"][3],
+    webcamPoses[0]["keypoints"][4],
+  ];
+}
+
+async function checkIfTimeToChangeState(
+  exerciseVideoRef,
+  webcamPoses,
+  capturedPosesDirection,
+  newExerciseSubstate,
+  newExerciseSubSubstate
+) {
+  if (exerciseVideoRef.current.paused) {
+    let similarity = 0;
+
+    Promise.all([
+      (similarity = getShapeSimilarityFromPoints(
+        getCurrentPose(webcamPoses),
+        capturedPosesDirection
+      )),
+      console.log("Similarity " + similarity),
+    ]);
+
+    if (similarity > 0.8) {
+      Promise.all(playNotification(), exerciseVideoRef.current.play());
+      await setTimeout(() => {
+        exerciseSubstate = newExerciseSubstate;
+        exerciseSubSubstate = newExerciseSubSubstate;
+      }, 1000);
+    }
+  }
+}
+
+async function setTimeToChangeSubSubState(
+  exerciseVideoRef,
+  newExerciseSubstate,
+  newExerciseSubSubstate,
+  time
+) {
+  if (exerciseVideoRef.current.paused) {
+    Promise.all(playNotification(), exerciseVideoRef.current.play());
+    await setTimeout(() => {
+      exerciseSubstate = newExerciseSubstate;
+      exerciseSubSubstate = newExerciseSubSubstate;
+    }, time);
+  }
 }
 
 export async function checkPosition(
@@ -46,10 +152,10 @@ export async function checkPosition(
   checkTime(exerciseVideoRef, interval, setAppState);
 
   //TODO: make loading screen activ euntil detector properly loads...
-
-  switch (appState) {
+  console.log("ExerciseState" + exerciseState);
+  switch (exerciseState) {
     case "prepare":
-      console.log(exerciseSubstate);
+      console.log("ExerciseSubstate " + exerciseSubstate);
       switch (exerciseSubstate) {
         case "fitToCamera":
           // If fits, move on, else wait until fits
@@ -113,7 +219,6 @@ export async function checkPosition(
                 webcamPoses[0]["keypoints"][3],
                 webcamPoses[0]["keypoints"][4],
               ]),
-              console.log("inside2"),
               playNotification(),
               exerciseVideoRef.current.play(),
             ]);
@@ -211,7 +316,8 @@ export async function checkPosition(
               exerciseVideoRef.current.play(),
             ]);
             await setTimeout(() => {
-              exerciseSubstate = "exit_test";
+              exerciseSubstate = "up";
+              exerciseState = "simple";
             }, 1000);
           }
 
@@ -222,6 +328,111 @@ export async function checkPosition(
         default:
           console.log("something is wrong with subState");
       }
+      break;
+    case "simple":
+      console.log("ExerciseSubstate " + exerciseSubstate);
+      switch (exerciseSubstate) {
+        case "up":
+          await checkIfTimeToChangeState(
+            exerciseVideoRef,
+            webcamPoses,
+            capturedPoses.up,
+            "right",
+            "-"
+          );
+
+          // if (exerciseVideoRef.current.paused) {
+          //   console.log("pause");
+          //   let similarity = 0;
+
+          //   Promise.all([
+          //     (similarity = getShapeSimilarityFromPoints(
+          //       getCurrentPose(webcamPoses),
+          //       capturedPoses.up
+          //     )),
+          //     console.log("Similarity " + similarity),
+          //   ]);
+
+          //   if (similarity > 0.8) {
+          //     Promise.all(playNotification(), exerciseVideoRef.current.play());
+          //     await setTimeout(() => {
+          //       exerciseSubstate = "up";
+          //     }, 1000);
+          //   }
+          // }
+
+          break;
+        case "right":
+          await checkIfTimeToChangeState(
+            exerciseVideoRef,
+            webcamPoses,
+            capturedPoses.right,
+            "down",
+            "-"
+          );
+
+          break;
+        case "down":
+          await checkIfTimeToChangeState(
+            exerciseVideoRef,
+            webcamPoses,
+            capturedPoses.down,
+            "left",
+            "-"
+          );
+          break;
+        case "left":
+          await checkIfTimeToChangeState(
+            exerciseVideoRef,
+            webcamPoses,
+            capturedPoses.left,
+            "up",
+            "-"
+          );
+          //TODO: MAKE SURE UPPER FUNCTION IS TRUE before setting combined
+          exerciseState = "combined";
+          break;
+
+        default:
+          console.log("default");
+      }
+
+    case "combined":
+      console.log("ExerciseSubstate " + exerciseSubstate);
+      switch (exerciseSubstate) {
+        case "up":
+          if (exerciseSubSubstate === "-") {
+            await checkIfTimeToChangeState(
+              exerciseVideoRef,
+              webcamPoses,
+              capturedPoses.up,
+              "up",
+              "0"
+            );
+          } else if (exerciseSubSubstate === "0") {
+            setTimeToChangeSubSubState(
+              exerciseVideoRef,
+              exerciseSubstate,
+              "1",
+              3000
+            );
+          } else if (exerciseSubSubstate === "1") {
+            setTimeToChangeSubSubState(exerciseVideoRef, "right", "-", 3000);
+          }
+
+          break;
+        case "right":
+          console.log("exerciseSubstate" + exerciseSubstate);
+          break;
+        case "down":
+          break;
+        case "left":
+          break;
+
+        default:
+          console.log("default combined");
+      }
+
       break;
     case "test":
       // works
