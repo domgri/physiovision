@@ -12,7 +12,10 @@ let exerciseState = "prepare";
 let exerciseSubstate = "fitToCamera";
 let exerciseSubSubstate = "0";
 
-let pausePoints = [0, 8, 24, 34, 40, 47, 57, 63, 68, 73, 78],
+let pausePoints = [
+    0, 8, 24, 34, 40, 47, 57, 63, 68, 73, 78, 83, 87, 92, 94, 97, 101, 104, 107,
+    112, 114, 117, 120, 121,
+  ],
   currentPausePointIndex = 1,
   currentPauseTime = pausePoints[currentPausePointIndex];
 
@@ -29,7 +32,6 @@ function mirror(ctx, videoWidth) {
 }
 
 function getShapeSimilarityFromPoints(currentPoses, capturedPoses) {
-  console.log(currentPoses);
   let currentCurve = [
     {
       x: currentPoses[4].x,
@@ -94,7 +96,8 @@ async function checkIfTimeToChangeState(
   webcamPoses,
   capturedPosesDirection,
   newExerciseSubstate,
-  newExerciseSubSubstate
+  newExerciseSubSubstate,
+  newExerciseState
 ) {
   if (exerciseVideoRef.current.paused) {
     let similarity = 0;
@@ -112,6 +115,7 @@ async function checkIfTimeToChangeState(
       await setTimeout(() => {
         exerciseSubstate = newExerciseSubstate;
         exerciseSubSubstate = newExerciseSubSubstate;
+        exerciseState = newExerciseState;
       }, 1000);
     }
   }
@@ -128,7 +132,7 @@ async function setTimeToChangeSubSubState(
     await setTimeout(() => {
       exerciseSubstate = newExerciseSubstate;
       exerciseSubSubstate = newExerciseSubSubstate;
-    }, time);
+    }, 1000);
   }
 }
 
@@ -156,6 +160,7 @@ export async function checkPosition(
   switch (exerciseState) {
     case "prepare":
       console.log("ExerciseSubstate " + exerciseSubstate);
+      console.log("ExerciseSubstate " + exerciseSubSubstate);
       switch (exerciseSubstate) {
         case "fitToCamera":
           // If fits, move on, else wait until fits
@@ -338,7 +343,8 @@ export async function checkPosition(
             webcamPoses,
             capturedPoses.up,
             "right",
-            "-"
+            "-",
+            exerciseState
           );
 
           // if (exerciseVideoRef.current.paused) {
@@ -368,7 +374,8 @@ export async function checkPosition(
             webcamPoses,
             capturedPoses.right,
             "down",
-            "-"
+            "-",
+            exerciseState
           );
 
           break;
@@ -378,7 +385,8 @@ export async function checkPosition(
             webcamPoses,
             capturedPoses.down,
             "left",
-            "-"
+            "-",
+            exerciseState
           );
           break;
         case "left":
@@ -387,10 +395,10 @@ export async function checkPosition(
             webcamPoses,
             capturedPoses.left,
             "up",
-            "-"
+            "-",
+            "combined"
           );
-          //TODO: MAKE SURE UPPER FUNCTION IS TRUE before setting combined
-          exerciseState = "combined";
+
           break;
 
         default:
@@ -406,8 +414,9 @@ export async function checkPosition(
               exerciseVideoRef,
               webcamPoses,
               capturedPoses.up,
-              "up",
-              "0"
+              exerciseSubstate,
+              "0",
+              exerciseState
             );
           } else if (exerciseSubSubstate === "0") {
             setTimeToChangeSubSubState(
@@ -422,11 +431,68 @@ export async function checkPosition(
 
           break;
         case "right":
-          console.log("exerciseSubstate" + exerciseSubstate);
+          if (exerciseSubSubstate === "-") {
+            await checkIfTimeToChangeState(
+              exerciseVideoRef,
+              webcamPoses,
+              capturedPoses.right,
+              exerciseSubstate,
+              "0",
+              exerciseState
+            );
+          } else if (exerciseSubSubstate === "0") {
+            setTimeToChangeSubSubState(
+              exerciseVideoRef,
+              exerciseSubstate,
+              "1",
+              3000
+            );
+          } else if (exerciseSubSubstate === "1") {
+            setTimeToChangeSubSubState(exerciseVideoRef, "down", "-", 3000);
+          }
           break;
         case "down":
+          if (exerciseSubSubstate === "-") {
+            await checkIfTimeToChangeState(
+              exerciseVideoRef,
+              webcamPoses,
+              capturedPoses.down,
+              exerciseSubstate,
+              "0",
+              exerciseState
+            );
+          } else if (exerciseSubSubstate === "0") {
+            setTimeToChangeSubSubState(
+              exerciseVideoRef,
+              exerciseSubstate,
+              "1",
+              3000
+            );
+          } else if (exerciseSubSubstate === "1") {
+            setTimeToChangeSubSubState(exerciseVideoRef, "left", "-", 3000);
+          }
           break;
         case "left":
+          if (exerciseSubSubstate === "-") {
+            await checkIfTimeToChangeState(
+              exerciseVideoRef,
+              webcamPoses,
+              capturedPoses.left,
+              exerciseSubstate,
+              "0",
+              exerciseState
+            );
+          } else if (exerciseSubSubstate === "0") {
+            setTimeToChangeSubSubState(
+              exerciseVideoRef,
+              exerciseSubstate,
+              "1",
+              3000
+            );
+          } else if (exerciseSubSubstate === "1") {
+            setTimeToChangeSubSubState(exerciseVideoRef, "up", "-", 3000);
+            //exerciseState = "stop";
+          }
           break;
 
         default:
